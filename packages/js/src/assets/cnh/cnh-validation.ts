@@ -12,12 +12,15 @@ import { AbstractValidatableDocument } from '../../contracts/abstract-validatabl
  */
 export class CNHValidation extends AbstractValidatableDocument {
     protected doValidate(): boolean {
+        // Strip all non-digit characters to get a clean numeric string
         const digits = this._raw.replace(/\D+/g, '');
 
+        // CNH must have exactly 11 digits
         if (digits.length !== 11) {
             return false;
         }
 
+        // Guard: DETRAN (Brazilian traffic authority) does not issue sequential same-digit blocks
         if (/^(\d)\1{10}$/.test(digits)) {
             return false;
         }
@@ -26,6 +29,9 @@ export class CNHValidation extends AbstractValidatableDocument {
         const dvInformed1 = Number(digits[9]);
         const dvInformed2 = Number(digits[10]);
 
+        // ===== First Verification Digit (DV1) =====
+        // Algorithm: weighted sum of first 9 digits (weights 9 down to 1) modulo 11.
+        // Overflow rule: if remainder > 9, set DV1 = 0 and flag firstIsTenPlus = true.
         let sum1 = 0;
         for (let i = 0, w = 9; i < 9; i++, w--) {
             sum1 += Number(base[i]) * w;
@@ -37,12 +43,16 @@ export class CNHValidation extends AbstractValidatableDocument {
             firstIsTenPlus = true;
         }
 
+        // ===== Second Verification Digit (DV2) =====
+        // Algorithm: weighted sum of first 9 digits (weights 1 up to 9) modulo 11.
+        // Overflow adjustment: if DV1 overflowed, subtract 2 from DV2 (wrapping: if < 0, add 9).
         let sum2 = 0;
         for (let i = 0, w = 1; i < 9; i++, w++) {
             sum2 += Number(base[i]) * w;
         }
         let dv2 = sum2 % 11;
 
+        // When DV1 overflowed, apply DV2 adjustment: subtract 2 with modulo 9 wrapping
         if (firstIsTenPlus) {
             if (dv2 - 2 < 0) {
                 dv2 += 9;
@@ -51,10 +61,12 @@ export class CNHValidation extends AbstractValidatableDocument {
             }
         }
 
+        // Final guard: DV2 overflow (if > 9) also becomes 0
         if (dv2 > 9) {
             dv2 = 0;
         }
 
+        // Final verification: check if computed DV1/DV2 match the informed check digits
         return dvInformed1 === dv1 && dvInformed2 === dv2;
     }
 }

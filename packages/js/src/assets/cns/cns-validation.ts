@@ -5,15 +5,23 @@ import { AbstractValidatableDocument } from '../../contracts/abstract-validatabl
  */
 export class CNSValidation extends AbstractValidatableDocument {
     protected doValidate(): boolean {
+        // Strip all non-digit characters to get a clean numeric string
         const digits = this._raw.replace(/\D+/g, '');
 
+        // CNS (National Health Card) must have exactly 15 digits
         if (digits.length !== 15) {
             return false;
         }
 
         const first = Number(digits[0]);
 
-        // Cards starting with 1 or 2 are derived from a PIS/PASEP registration
+        // ===== CNS Type 1 & 2: Derived from PIS/PASEP Registration =====
+        // Cards starting with 1 or 2 are linked to a valid PIS registration (digits 0-10).
+        // Algorithm: weighted sum of PIS (first 11 digits, weights 15 down to 5) modulo 11.
+        // DV calculation: 11 - remainder, with special Ministry of Health rules:
+        //   - If DV = 11 → set to 0, suffix = '000'
+        //   - If DV = 10 → add 2, recalculate DV = 11 - new_remainder, suffix = '001'
+        //   - Otherwise DV, suffix = '000'
         if (first === 1 || first === 2) {
             const pis = digits.slice(0, 11);
 

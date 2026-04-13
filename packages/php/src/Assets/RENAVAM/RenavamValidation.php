@@ -15,12 +15,15 @@ final class RenavamValidation extends AbstractValidatableDocument
 {
     protected function doValidate(): bool
     {
+        // Strip all non-digit characters to get a clean numeric string
         $digits = preg_replace('/\D+/', '', $this->raw()) ?? '';
 
+        // RENAVAM must have exactly 11 digits
         if (strlen($digits) !== 11) {
             return false;
         }
-        // DENATRAN: all-same-digit sequences are not assigned
+
+        // Guard: DENATRAN (Brazilian national vehicle registry) does not assign all-same-digit sequences
         if (preg_match('/^(\d)\1{10}$/', $digits) === 1) {
             return false;
         }
@@ -28,7 +31,9 @@ final class RenavamValidation extends AbstractValidatableDocument
         $base = substr($digits, 0, 10);
         $dvIn = (int) $digits[10];
 
-        // Algorithm: reverse the 10-digit base, then apply weights [2..9, 2, 3]
+        // ===== Verification Digit (DV) =====
+        // Algorithm: reverse the 10-digit base, then apply weights [2,3,4,5,6,7,8,9,2,3].
+        // DV = 11 - (weighted_sum % 11); if DV ≥ 10, set to 0.
         $rev   = strrev($base);
         $pesos = [2, 3, 4, 5, 6, 7, 8, 9, 2, 3];
 
@@ -43,6 +48,7 @@ final class RenavamValidation extends AbstractValidatableDocument
             $dv = 0;
         }
 
+        // Final verification: check if computed DV matches the check digit at position 10
         return $dv === $dvIn;
     }
 }
