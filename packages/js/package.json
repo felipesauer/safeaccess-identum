@@ -1,0 +1,52 @@
+{
+    "name": "@safeaccess/identum",
+    "version": "0.1.0",
+    "private": false,
+    "description": "Brazilian document validation (CPF, CNPJ, CNH, IE, PIS, CNS, RENAVAM, CEP, Plate, Voter Title) — JavaScript/TypeScript",
+    "license": "MIT",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "keywords": [
+        "safeaccess",
+        "identum",
+        "cpf",
+        "cnpj",
+        "cnh",
+        "ie",
+        "pis",
+        "cns",
+        "renavam",
+        "cep",
+        "brazilian-documents",
+        "validation"
+    ],
+    "scripts": {
+        "build": "tsc",
+        "test": "vitest run",
+        "typecheck": "tsc --noEmit",
+        "test:typecheck": "tsc --noEmit",
+        "test:parity": "vitest run --reporter=verbose",
+        "lint": "npx eslint src/ tests/",
+        "test:coverage": "npx vitest run --coverage",
+        "test:mutation": "npx stryker run"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/felipesauer/safeaccess-identum",
+        "directory": "packages/js"
+    },
+    "devDependencies": {
+        "@stryker-mutator/core": "^9.6.0",
+        "@stryker-mutator/vitest-runner": "^9.6.0",
+        "@vitest/coverage-v8": "^4.1.2",
+        "typescript": "^6.0.2",
+        "vitest": "^4.1.2"
+    }
+}
