@@ -13,6 +13,7 @@ export class CNSValidation extends AbstractValidatableDocument {
 
         const first = Number(digits[0]);
 
+        // Cards starting with 1 or 2 are derived from a PIS/PASEP registration
         if (first === 1 || first === 2) {
             const pis = digits.slice(0, 11);
 
@@ -29,6 +30,7 @@ export class CNSValidation extends AbstractValidatableDocument {
                 dv = 0;
                 resultado = pis + '000' + String(dv);
             } else if (dv === 10) {
+                // Ministry of Health special rule: offset by 2 and recalculate
                 sum += 2;
                 dv = 11 - (sum % 11);
                 resultado = pis + '001' + String(dv);
@@ -39,7 +41,9 @@ export class CNSValidation extends AbstractValidatableDocument {
             return digits === resultado;
         }
 
+        // Cards starting with 7, 8, or 9 are provisional (not tied to PIS)
         if (first === 7 || first === 8 || first === 9) {
+            // Weighted sum 15..1 must be divisible by 11
             let sum = 0;
             for (let i = 0, w = 15; i < 15; i++, w--) {
                 sum += Number(digits[i]) * w;

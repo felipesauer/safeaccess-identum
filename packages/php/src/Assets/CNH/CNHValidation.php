@@ -17,20 +17,19 @@ final class CNHValidation extends AbstractValidatableDocument
     {
         $digits = preg_replace('/\D+/', '', $this->raw()) ?? '';
 
-        // 11 dígitos e não pode ser sequência repetida
         if (strlen($digits) !== 11) {
             return false;
         }
+        // DETRAN: sequential same-digit blocks are not issued
         if (preg_match('/^(\d)\1{10}$/', $digits) === 1) {
             return false;
         }
 
-        // base (9 primeiros), DVs informados
         $base = substr($digits, 0, 9);
         $dvInformed1 = (int) $digits[9];
         $dvInformed2 = (int) $digits[10];
 
-        // DV1: pesos 9..1
+        // DV1: Mod 11 descending weights 9..1
         $sum1 = 0;
         for ($i = 0, $w = 9; $i < 9; $i++, $w--) {
             $sum1 += ((int) $base[$i]) * $w;
@@ -42,14 +41,14 @@ final class CNHValidation extends AbstractValidatableDocument
             $firstIsTenPlus = true;
         }
 
-        // DV2: pesos 1..9
+        // DV2: Mod 11 ascending weights 1..9
         $sum2 = 0;
         for ($i = 0, $w = 1; $i < 9; $i++, $w++) {
             $sum2 += ((int) $base[$i]) * $w;
         }
         $dv2 = $sum2 % 11;
 
-        // Regra especial quando o módulo do 1º DV > 9 (ou seja, virou 0)
+        // When DV1 overflowed (went to 0), DV2 gets shifted by -2 (wrapping around 9)
         if ($firstIsTenPlus) {
             if ($dv2 - 2 < 0) {
                 $dv2 += 9;

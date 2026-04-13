@@ -5,70 +5,45 @@ declare(strict_types=1);
 namespace SafeAccess\Identum\Assets\IE;
 
 /**
- * Reusable arithmetic helpers for document check-digit calculations.
- *
- * Provides digit extraction, weighted sums, and repeated-sequence checks
- * used across all state-specific IE validation rules.
+ * Arithmetic helpers shared by all state-specific IE rules.
  *
  * @internal
  */
 trait DocumentMath
 {
     /**
-     * Remove all non-numeric characters, returning a string of digits only.
+     * Strips non-numeric characters from a raw value.
      *
-     * Example: "12.345-67" → "1234567"
-     *
-     * @param string $v Raw value.
-     * @param string $patters
-     * @return string Digits-only string.
+     * @param string $v
+     * @param string $pattern
+     * @return string
      */
-    public function digits(string $v, string $patters = '/\D+/'): string
+    public function digits(string $v, string $pattern = '/\D+/'): string
     {
-        return preg_replace($patters, '', $v) ?? '';
+        return preg_replace($pattern, '', $v) ?? '';
     }
 
     /**
-     * Convert a string of digits into an array of integers.
-     *
-     * Example: "1234" → [1, 2, 3, 4]
-     *
-     * @param string $digits Digits-only string.
-     * @return array<int> List of integers corresponding to each digit.
+     * @param string $digits
+     * @return array<int>
      */
     public function toIntArray(string $digits): array
     {
         return array_map('intval', str_split($digits));
     }
 
-    /**
-     * Check whether all digits in a string are the same.
-     *
-     * Examples:
-     * - "000000" → true
-     * - "111111" → true
-     * - "123456" → false
-     *
-     * @param string $digits Digits-only string.
-     * @return bool True if all digits are identical, false otherwise.
-     */
+    /** Returns true when every character in $digits is the same ('000', '111', etc.). */
     public function allSameDigits(string $digits): bool
     {
         return $digits !== '' && count(array_unique(str_split($digits))) === 1;
     }
 
     /**
-     * Compute the weighted sum of digit × weight products.
+     * Weighted sum: sum of (digit[i] × weight[i]) over min(len(digits), len(weights)).
      *
-     * Example:
-     * digits = [1, 2, 3], weights = [2, 3, 4]
-     * → (1×2) + (2×3) + (3×4) = 20
-     *
-     * The computation uses the shortest length between the digits and weights arrays.
-     *
-     * @param array<int> $digits Array of integers representing digits.
-     * @param array<int> $weights Array of integers representing weights.
-     * @return int Weighted sum.
+     * @param array<int> $digits
+     * @param array<int> $weights
+     * @return int
      */
     public function sumProducts(array $digits, array $weights): int
     {

@@ -23,15 +23,10 @@ abstract class AbstractStateRule
     use DocumentMath;
 
     /**
-     * Execute the validation for the given IE string.
+     * Validate using the UF-specific algorithm.
      *
-     * Implementations should:
-     * - Normalize the input (digits-only or alphanumeric as required by the UF).
-     * - Apply length checks, repeated-sequence checks, and check digit algorithms.
-     * - Return true if the IE is valid for the specific UF, false otherwise.
-     *
-     * @param string $ie Raw IE value (may include formatting or separators).
-     * @return bool True if valid according to the UF's rule, false otherwise.
+     * @param string $ie Raw IE value (may include formatting).
+     * @return bool
      */
     abstract public function execute(string $ie): bool;
 }

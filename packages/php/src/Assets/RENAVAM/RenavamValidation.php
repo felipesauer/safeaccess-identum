@@ -17,19 +17,18 @@ final class RenavamValidation extends AbstractValidatableDocument
     {
         $digits = preg_replace('/\D+/', '', $this->raw()) ?? '';
 
-        // 11 dígitos e não pode ser todos iguais
         if (strlen($digits) !== 11) {
             return false;
         }
+        // DENATRAN: all-same-digit sequences are not assigned
         if (preg_match('/^(\d)\1{10}$/', $digits) === 1) {
             return false;
         }
 
-        // separa base (10) e DV informado (1)
         $base = substr($digits, 0, 10);
         $dvIn = (int) $digits[10];
 
-        // inverte a base e aplica os pesos 2..9,2,3
+        // Algorithm: reverse the 10-digit base, then apply weights [2..9, 2, 3]
         $rev   = strrev($base);
         $pesos = [2, 3, 4, 5, 6, 7, 8, 9, 2, 3];
 

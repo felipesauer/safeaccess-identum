@@ -36,13 +36,13 @@ describe(CPFValidation::class, function () {
     });
 
     it('ignores non-digit characters before validating', function () {
-        $masked = new CPFValidation('864.600.120-24');
-        $noisy = new CPFValidation("  864 600-120..24 \n\t");
-        $clean = new CPFValidation('86460012024');
+        $formatted   = new CPFValidation('864.600.120-24');
+        $withNoise   = new CPFValidation("  864 600-120..24 \n\t");
+        $digitsOnly  = new CPFValidation('86460012024');
 
-        expect($masked->validate())->toBeTrue();
-        expect($noisy->validate())->toBeTrue();
-        expect($clean->validate())->toBeTrue();
+        expect($formatted->validate())->toBeTrue();
+        expect($withNoise->validate())->toBeTrue();
+        expect($digitsOnly->validate())->toBeTrue();
     });
 
     it('whitelist() overrides invalid result', function () {

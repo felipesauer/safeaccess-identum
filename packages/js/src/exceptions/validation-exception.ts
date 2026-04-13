@@ -1,10 +1,8 @@
 /**
- * Base exception for all SafeAccess Identum errors.
+ * Root exception for all validation errors. Catch this to handle any
+ * failure coming out of the library without importing every subclass.
  *
- * Serves as the root of the exception hierarchy, enabling catch-all handling
- * for any error originating from document validation operations.
- *
- * @see {@link InvalidStateRuleException} Thrown when an invalid state rule is requested.
+ * @see {@link InvalidStateRuleException}
  */
 export class ValidationException extends Error {
     constructor(message: string) {

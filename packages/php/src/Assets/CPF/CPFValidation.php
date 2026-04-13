@@ -27,17 +27,16 @@ final class CPFValidation extends AbstractValidatableDocument
     {
         $digits = preg_replace('/\D+/', '', $this->raw()) ?? '';
 
-        // length
         if (strlen($digits) !== 11) {
             return false;
         }
 
-        // repeated sequence
+        // Receita Federal: any 11-same-digit sequence is reserved and permanently invalid
         if (preg_match('/^(\d)\1{10}$/', $digits) === 1) {
             return false;
         }
 
-        // 1st check digit
+        // DV1: Mod 11 over the first 9 digits, weights 10..2
         $sum = 0;
 
         for ($i = 0, $w = 10; $i < 9; $i++, $w--) {
@@ -47,7 +46,7 @@ final class CPFValidation extends AbstractValidatableDocument
         $rest = $sum % 11;
         $dv1  = ($rest < 2) ? 0 : 11 - $rest;
 
-        // 2nd check digit
+        // DV2: Mod 11 over the first 10 digits (including DV1), weights 11..2
         $sum = 0;
 
         for ($i = 0, $w = 11; $i < 10; $i++, $w--) {

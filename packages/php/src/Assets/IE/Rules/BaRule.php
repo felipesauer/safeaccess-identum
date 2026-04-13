@@ -6,19 +6,17 @@ namespace SafeAccess\Identum\Assets\IE\Rules;
 
 use SafeAccess\Identum\Assets\IE\AbstractStateRule;
 
+/**
+ * Validates Bahia (BA) IE numbers.
+ *
+ * BA uses two different check-digit methods depending on d[1]:
+ *  - d[1] ∈ {0,1,2,3,4,5,8} → Mod-10 digit-sum (Luhn-style)
+ *  - d[1] ∈ {6,7,9}          → Mod-11 (result ≥ 10 → DV = 0)
+ *
+ * Accepts 8 or 9 digit formats. DV2 is computed first, then DV1.
+ */
 final class BaRule extends AbstractStateRule
 {
-    /**
-     * Entry point for Bahia IE validation.
-     *
-     * Rules:
-     * - Length can be 8 or 9 digits.
-     * - Decide Mod10 or Mod11 by the 2nd digit: {0,1,2,3,4,5,8} => Mod10; otherwise Mod11.
-     * - Compute DV2 first, then DV1.
-     *
-     * @param string $ie
-     * @return bool
-     */
     public function execute(string $ie): bool
     {
         $digits = $this->digits($ie);

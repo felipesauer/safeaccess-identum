@@ -11,6 +11,7 @@ export class RenavamValidation extends AbstractValidatableDocument {
             return false;
         }
 
+        // DENATRAN: all-same-digit sequences are not assigned
         if (/^(\d)\1{10}$/.test(digits)) {
             return false;
         }
@@ -18,6 +19,7 @@ export class RenavamValidation extends AbstractValidatableDocument {
         const base = digits.slice(0, 10);
         const dvIn = Number(digits[10]);
 
+        // Algorithm: reverse the 10-digit base, then apply weights [2..9, 2, 3]
         const rev = base.split('').reverse().join('');
         const pesos = [2, 3, 4, 5, 6, 7, 8, 9, 2, 3];
 

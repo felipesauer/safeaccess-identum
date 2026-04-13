@@ -13,10 +13,12 @@ export class CPFValidation extends AbstractValidatableDocument {
             return false;
         }
 
+        // Receita Federal: any 11-same-digit sequence is reserved and permanently invalid
         if (/^(\d)\1{10}$/.test(digits)) {
             return false;
         }
 
+        // DV1: Mod 11 over first 9 digits, weights 10..2
         let sum = 0;
         for (let i = 0, w = 10; i < 9; i++, w--) {
             sum += Number(digits[i]) * w;
@@ -24,6 +26,7 @@ export class CPFValidation extends AbstractValidatableDocument {
         const rest1 = sum % 11;
         const dv1 = rest1 < 2 ? 0 : 11 - rest1;
 
+        // DV2: Mod 11 over first 10 digits (includes DV1), weights 11..2
         sum = 0;
         for (let i = 0, w = 11; i < 10; i++, w--) {
             sum += Number(digits[i]) * w;

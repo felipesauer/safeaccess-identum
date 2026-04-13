@@ -26,6 +26,8 @@ jobs:
                 php: ["8.2", "8.3", "8.4"]
                 deps: ["core", "full"]
                 exclude:
+                    # Pest 3 pulls Symfony 8.0.x which requires PHP >= 8.4.
+                    # Until a Pest release loosens that constraint, run full deps on 8.4 only.
                     - php: "8.2"
                       deps: "full"
                     - php: "8.3"

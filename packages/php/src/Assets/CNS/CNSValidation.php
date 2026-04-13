@@ -23,11 +23,10 @@ final class CNSValidation extends AbstractValidatableDocument
 
         $first = (int) $digits[0];
 
-        // 1) Números iniciados por 1 ou 2 (derivados de PIS/PASEP)
+        // Cards starting with 1 or 2 are derived from a PIS/PASEP registration
         if ($first === 1 || $first === 2) {
             $pis = substr($digits, 0, 11);
 
-            // soma ponderada 15..5 sobre os 11 dígitos (PIS)
             $sum = 0;
             for ($i = 0, $w = 15; $i < 11; $i++, $w--) {
                 $sum += ((int) $pis[$i]) * $w;
@@ -41,7 +40,7 @@ final class CNSValidation extends AbstractValidatableDocument
                 $dv = 0;
                 $resultado = $pis . '000' . $dv;
             } elseif ($dv === 10) {
-                // regra especial: somar 2 e recalcular
+                // Ministry of Health special rule: offset by 2 and recalculate
                 $sum += 2;
                 $dv = 11 - ($sum % 11);
                 $resultado = $pis . '001' . $dv;
@@ -52,9 +51,9 @@ final class CNSValidation extends AbstractValidatableDocument
             return $digits === $resultado;
         }
 
-        // 2) Números iniciados por 7, 8 ou 9 (provisórios)
+        // Cards starting with 7, 8, or 9 are provisional (not tied to PIS)
         if ($first === 7 || $first === 8 || $first === 9) {
-            // soma ponderada 15..1 sobre os 15 dígitos deve ser múltiplo de 11
+            // Weighted sum 15..1 must be divisible by 11
             $sum = 0;
             for ($i = 0, $w = 15; $i < 15; $i++, $w--) {
                 $sum += ((int) $digits[$i]) * $w;
@@ -62,7 +61,6 @@ final class CNSValidation extends AbstractValidatableDocument
             return ($sum % 11) === 0;
         }
 
-        // Outros dígitos iniciais são inválidos
         return false;
     }
 }
