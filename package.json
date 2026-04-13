@@ -1,0 +1,34 @@
+{
+    "private": true,
+    "name": "safeaccess-identum-monorepo",
+    "type": "module",
+    "workspaces": [
+        "packages/*"
+    ],
+    "description": "Monorepo tooling for safeaccess-identum",
+    "scripts": {
+        "prepare": "husky",
+        "test:js": "cd packages/js && npm test",
+        "test:php": "cd packages/php && composer test",
+        "test": "npm run test:js && npm run test:php",
+        "test:mutation:js": "cd packages/js && npm run test:mutation",
+        "test:mutation:php": "cd packages/php && composer test:mutation",
+        "test:mutation": "npm run test:mutation:js && npm run test:mutation:php",
+        "lint:js": "cd packages/js && npm run lint",
+        "format:js": "cd packages/js && npm run format",
+        "format:php": "cd packages/php && composer format"
+    },
+    "devDependencies": {
+        "@commitlint/cli": "^20.4",
+        "@commitlint/config-conventional": "^20.4",
+        "@eslint/js": "^10.0.1",
+        "eslint": "^10.2.0",
+        "husky": "^9.0",
+        "lint-staged": "^16.3",
+        "prettier": "^3.0",
+        "typescript-eslint": "^8.57.1"
+    },
+    "engines": {
+        "node": ">=22"
+    }
+}
