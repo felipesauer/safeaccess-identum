@@ -1,0 +1,23 @@
+{
+    "testRunner": "vitest",
+    "mutate": [
+        "src/**/*.ts",
+        "!src/**/*.test.ts",
+        "!src/index.ts",
+        "!src/contracts/**/*.ts",
+        "!src/exceptions/**/*.ts"
+    ],
+    "thresholds": {
+        "high": 85,
+        "low": 85,
+        "break": 85
+    },
+    "timeoutMS": 15000,
+    "concurrency": 4,
+    "incremental": true,
+    "incrementalFile": "reports/stryker/.incremental.json",
+    "reporters": ["json", "progress"],
+    "jsonReporter": {
+        "fileName": "reports/stryker/mutation.json"
+    }
+}
