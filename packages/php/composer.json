@@ -26,7 +26,7 @@
         "source": "https://github.com/felipesauer/safeaccess-identum/tree/main/packages/php"
     },
     "require": {
-        "php": "^8.4"
+        "php": "^8.2"
     },
     "require-dev": {
         "pestphp/pest": "^3.0",

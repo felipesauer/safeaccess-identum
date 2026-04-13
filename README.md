@@ -13,7 +13,7 @@
   <a href="https://www.npmjs.com/package/@safeaccess/identum"><img src="https://img.shields.io/npm/v/@safeaccess/identum?label=npm" alt="npm"></a>
   <a href="https://packagist.org/packages/safeaccess/identum"><img src="https://img.shields.io/packagist/v/safeaccess/identum?label=packagist" alt="Packagist"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
-  <img src="https://img.shields.io/badge/PHP-8.4%2B-777BB4?logo=php&logoColor=white" alt="PHP 8.4+">
+  <img src="https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php&logoColor=white" alt="PHP 8.2+">
   <img src="https://img.shields.io/badge/Node.js-22%2B-339933?logo=nodedotjs&logoColor=white" alt="Node.js 22+">
   <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/felipesauer/80c602b17107f88fb17794d4d44c94fa/raw/infection-msi.json" alt="PHP Infection MSI">
   <img src="https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Ffelipesauer%2Fsafeaccess-identum%2Fmain" alt="JS Stryker MSI">
@@ -66,7 +66,7 @@ The same API in TypeScript, identical output for identical input.
 
 | Package                                | Language         | Install                                |
 | -------------------------------------- | ---------------- | -------------------------------------- |
-| [`safeaccess/identum`](packages/php/)  | PHP 8.4+         | `composer require safeaccess/identum`  |
+| [`safeaccess/identum`](packages/php/)  | PHP 8.2+         | `composer require safeaccess/identum`  |
 | [`@safeaccess/identum`](packages/js/)  | TypeScript (ESM) | `npm install @safeaccess/identum`      |
 
 Both packages expose the same public API surface and are tested for behavioral parity.
@@ -79,7 +79,7 @@ Both packages expose the same public API surface and are tested for behavioral p
 composer require safeaccess/identum
 ```
 
-**Requirements:** PHP 8.4+
+**Requirements:** PHP 8.2+
 
 ### TypeScript
 

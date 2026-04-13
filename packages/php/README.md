@@ -7,7 +7,7 @@
 <p align="center">
   <a href="https://packagist.org/packages/safeaccess/identum"><img src="https://img.shields.io/packagist/v/safeaccess/identum?label=packagist" alt="Packagist"></a>
   <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
-  <img src="https://img.shields.io/badge/PHP-8.4%2B-777BB4?logo=php&amp;logoColor=white" alt="PHP 8.4+">
+  <img src="https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php&amp;logoColor=white" alt="PHP 8.2+">
   <img src="https://img.shields.io/badge/PHPStan-max-0A6DAD" alt="PHPStan max">
   <img src="https://img.shields.io/badge/Tested%20with-Pest-FF5733" alt="Tested with Pest">
   <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/felipesauer/80c602b17107f88fb17794d4d44c94fa/raw/infection-msi.json" alt="Infection MSI">
@@ -25,7 +25,7 @@ PHP library for validating Brazilian documents — CPF, CNPJ, CNH, CEP, CNS, PIS
 - **`validateOrFail()`** — throws `ValidationException` instead of returning `false`
 - **Blacklist / whitelist** — force-accept or force-reject specific values
 - **100% line + branch coverage** — tested with Pest 3 · Infection mutation testing (≥ 85% MSI)
-- **Zero production dependencies** — pure PHP 8.4+
+- **Zero production dependencies** — pure PHP 8.2+
 
 ## The problem
 
@@ -54,7 +54,7 @@ Identum::ie('343.173.196.450', StateEnum::SP)->validate();     // true — all 2
 composer require safeaccess/identum
 ```
 
-**Requirements:** PHP 8.4+
+**Requirements:** PHP 8.2+
 
 ## Quick start
 
