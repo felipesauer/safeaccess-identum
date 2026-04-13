@@ -10,8 +10,8 @@
         "customPath": "vendor/bin/pest"
     },
     "testFramework": "phpunit",
-    "minMsi": 85,
-    "minCoveredMsi": 85,
+    "minMsi": 100,
+    "minCoveredMsi": 100,
     "threads": "max",
     "mutators": {
         "@default": true
