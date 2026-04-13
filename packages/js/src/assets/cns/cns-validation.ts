@@ -49,7 +49,9 @@ export class CNSValidation extends AbstractValidatableDocument {
             return digits === resultado;
         }
 
-        // Cards starting with 7, 8, or 9 are provisional (not tied to PIS)
+        // ===== CNS Type 7, 8, 9: Provisional (Not Tied to PIS) =====
+        // Provisional cards are random 15-digit numbers. Validation is simple:
+        // weighted sum (15 down to 1) must be divisible by 11 (mod 11 = 0).
         if (first === 7 || first === 8 || first === 9) {
             // Weighted sum 15..1 must be divisible by 11
             let sum = 0;
