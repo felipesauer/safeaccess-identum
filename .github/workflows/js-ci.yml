@@ -1,0 +1,70 @@
+name: JS CI
+
+on:
+    push:
+        branches: [main]
+        paths:
+            - "packages/js/**"
+            - ".github/workflows/js-ci.yml"
+    pull_request:
+        branches: [main]
+        paths:
+            - "packages/js/**"
+            - ".github/workflows/js-ci.yml"
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+    test:
+        name: Node ${{ matrix.node }}
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                node: ["22", "24"]
+
+        defaults:
+            run:
+                working-directory: packages/js
+
+        steps:
+            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+            - name: Setup Node.js
+              uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
+              with:
+                  node-version: ${{ matrix.node }}
+
+            - name: Install dependencies
+              working-directory: .
+              run: npm install
+
+            - name: Build
+              run: npm run build
+
+            - name: Run tests
+              run: npm test -- --coverage
+
+            - name: Upload coverage to Codecov
+              if: matrix.node == '24'
+              uses: codecov/codecov-action@v4
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }}
+                  flags: javascript
+                  directory: packages/js/coverage
+
+            - name: Typecheck
+              if: matrix.node == '24'
+              run: npm run typecheck
+
+            - name: Cross-parity tests
+              if: matrix.node == '24'
+              run: npm run test:parity
+
+            - name: Lint
+              if: matrix.node == '24'
+              run: npm run lint
+
+
