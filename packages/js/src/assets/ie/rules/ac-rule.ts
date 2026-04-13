@@ -1,5 +1,6 @@
 import { AbstractStateRule } from '../abstract-state-rule.js';
 
+/** Validates Acre (AC) IE numbers. 13 digits, prefix 01. Two Mod-11 DVs (rest < 2 → 0): DV1 weights [4,3,2,9,8,7,6,5,4,3,2]; DV2 weights [5,4,3,2,9,8,7,6,5,4,3,2]. */
 export class AcRule extends AbstractStateRule {
     execute(ie: string): boolean {
         const d = this.digits(ie);

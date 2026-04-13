@@ -6,15 +6,14 @@ namespace SafeAccess\Identum\Assets\IE\Rules;
 
 use SafeAccess\Identum\Assets\IE\AbstractStateRule;
 
+/**
+ * Validates Mato Grosso (MT) IE numbers.
+ *
+ * 11 digits, single Mod-11 DV: dv = 11 - rest; if dv ≥ 10 → 0.
+ * Weights [3,2,9,8,7,6,5,4,3,2] over first 10 digits.
+ */
 final class MtRule extends AbstractStateRule
 {
-    /**
-     * Entry point for Mato Grosso IE validation (11 digits).
-     * Policy: dv = 11 - rest; if dv >= 10 => 0 (GE10_EQ0).
-     *
-     * @param string $ie
-     * @return bool
-     */
     public function execute(string $ie): bool
     {
         $digits = $this->digits($ie);
@@ -28,11 +27,8 @@ final class MtRule extends AbstractStateRule
     }
 
     /**
-     * Mod 11: dv = 11 - rest; if dv >= 10 => 0.
-     *
      * @param array<int,int> $digits
      * @param array<int,int> $weights
-     * @return int
      */
     private function dvMod11Ge10Eq0(array $digits, array $weights): int
     {

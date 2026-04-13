@@ -1,5 +1,6 @@
 import { AbstractStateRule } from '../abstract-state-rule.js';
 
+/** Validates Pará (PA) IE numbers. 9 digits, prefix 15, single Mod-11 DV (rest < 2 → 0). */
 export class PaRule extends AbstractStateRule {
     execute(ie: string): boolean {
         const d = this.digits(ie);

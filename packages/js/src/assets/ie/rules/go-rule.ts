@@ -1,5 +1,11 @@
 import { AbstractStateRule } from '../abstract-state-rule.js';
 
+/**
+ * Validates Goiás (GO) IE numbers.
+ *
+ * 9 digits. Standard Mod-11 DV with a special rule when remainder == 1:
+ * if the 8-digit base falls in [10103105..10119997], DV = 1; otherwise DV = 0.
+ */
 export class GoRule extends AbstractStateRule {
     execute(ie: string): boolean {
         const d = this.digits(ie);

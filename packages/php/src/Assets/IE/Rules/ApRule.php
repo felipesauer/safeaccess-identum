@@ -6,19 +6,17 @@ namespace SafeAccess\Identum\Assets\IE\Rules;
 
 use SafeAccess\Identum\Assets\IE\AbstractStateRule;
 
+/**
+ * Validates Amapá (AP) IE numbers.
+ *
+ * 9 digits, prefix 03. DV = 11 - ((sum + p) % 11) with range-based offsets p/d:
+ *  - [3000001..3017000]: p=5, d=0
+ *  - [3017001..3019022]: p=9, d=1
+ *  - otherwise: p=0, d=0
+ * DV=10 → 0; DV=11 → d.
+ */
 final class ApRule extends AbstractStateRule
 {
-    /**
-     * Entry point for Amapá IE validation.
-     *
-     * Requirements:
-     * - Must have exactly 9 digits after normalization.
-     * - Must start with prefix "03".
-     * - Single check digit (index 8) with AP range constants p/d.
-     *
-     * @param string $ie
-     * @return bool
-     */
     public function execute(string $ie): bool
     {
         $digits = $this->digits($ie);

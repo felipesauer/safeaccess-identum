@@ -6,20 +6,14 @@ namespace SafeAccess\Identum\Assets\IE\Rules;
 
 use SafeAccess\Identum\Assets\IE\AbstractStateRule;
 
+/**
+ * Validates Alagoas (AL) IE numbers.
+ *
+ * 9 digits, prefix 24. DV = (sum × 10) % 11; if result is 10 → DV = 0.
+ * Weights [9,8,7,6,5,4,3,2] over first 8 digits.
+ */
 final class AlRule extends AbstractStateRule
 {
-    /**
-     * Entry point for Alagoas IE validation.
-     *
-     * Requirements:
-     * - Must have exactly 9 digits after normalization.
-     * - Must start with prefix "24".
-     * - Not all digits can be the same.
-     * - Single check digit at position 9.
-     *
-     * @param string $ie Raw IE string (masked or unmasked)
-     * @return bool True if valid, false otherwise
-     */
     public function execute(string $ie): bool
     {
         $digits = $this->digits($ie);
@@ -36,18 +30,6 @@ final class AlRule extends AbstractStateRule
         return $this->validate9($digits);
     }
 
-    /**
-     * Validates AL 9-digit IE.
-     *
-     * Algorithm:
-     *  - sum = Σ(base8[i] * weights[i]) with weights [9,8,7,6,5,4,3,2]
-     *  - dv  = (sum * 10) % 11
-     *  - if dv == 10 then dv = 0
-     *  - compare with last digit
-     *
-     * @param string $digits Numeric string with 9 digits
-     * @return bool
-     */
     private function validate9(string $digits): bool
     {
         $base8 = substr($digits, 0, 8);

@@ -1,5 +1,11 @@
 import { AbstractStateRule } from '../abstract-state-rule.js';
 
+/**
+ * Validates Mato Grosso (MT) IE numbers.
+ *
+ * 11 digits, single Mod-11 DV: dv = 11 - rest; if dv ≥ 10 → 0.
+ * Weights [3,2,9,8,7,6,5,4,3,2] over first 10 digits.
+ */
 export class MtRule extends AbstractStateRule {
     execute(ie: string): boolean {
         const d = this.digits(ie);

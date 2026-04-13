@@ -6,19 +6,15 @@ namespace SafeAccess\Identum\Assets\IE\Rules;
 
 use SafeAccess\Identum\Assets\IE\AbstractStateRule;
 
+/**
+ * Validates Minas Gerais (MG) IE numbers.
+ *
+ * 13 digits. DV1 uses Mod-10 digit-sum with alternating 1/2 weights
+ * over a 12-char auxiliary string formed by inserting '0' at position 4.
+ * DV2 uses Mod-11 with weights [3,2,11,10,9,8,7,6,5,4,3,2] over 11 digits + DV1.
+ */
 final class MgRule extends AbstractStateRule
 {
-    /**
-     * Entry point for Minas Gerais IE validation (13 digits).
-     *
-     * Rules:
-     * - D1: Insert '0' at position 4 over the first 11 digits (making 12),
-     *      then Mod 10 (digit-sum) with alternating 1/2 multipliers.
-     * - D2: Mod 11 with weights [3,2,11,10,9,8,7,6,5,4,3,2] over (first 11 digits + D1).
-     *
-     * @param string $ie
-     * @return bool
-     */
     public function execute(string $ie): bool
     {
         $digits = $this->digits($ie);

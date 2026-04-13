@@ -1,5 +1,12 @@
 import { AbstractStateRule } from '../abstract-state-rule.js';
 
+/**
+ * Validates Pernambuco (PE) IE numbers.
+ *
+ * Two accepted formats:
+ *  - 14 digits (current): single DV, Mod-11 rest < 2 → 0, weights [5,4,3,2,9,8,7,6,5,4,3,2,9]
+ *  - 9 digits (legacy): two DVs, both "≥ 10 → 0", weights [8,7,6,5,4,3,2] and [9,8,7,6,5,4,3,2]
+ */
 export class PeRule extends AbstractStateRule {
     execute(ie: string): boolean {
         const d = this.digits(ie);

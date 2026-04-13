@@ -6,15 +6,15 @@ namespace SafeAccess\Identum\Assets\IE\Rules;
 
 use SafeAccess\Identum\Assets\IE\AbstractStateRule;
 
+/**
+ * Validates Paraná (PR) IE numbers.
+ *
+ * 10 digits, two Mod-11 DVs (rest < 2 → 0):
+ *  - DV1: weights [3,2,7,6,5,4,3,2] over first 8 digits
+ *  - DV2: weights [4,3,2,7,6,5,4,3,2] over first 9 digits
+ */
 final class PrRule extends AbstractStateRule
 {
-    /**
-     * Entry point for Paraná IE validation (10 digits).
-     * Two check digits (positions 9 and 10).
-     *
-     * @param string $ie
-     * @return bool
-     */
     public function execute(string $ie): bool
     {
         $digits = $this->digits($ie);
@@ -32,11 +32,8 @@ final class PrRule extends AbstractStateRule
     }
 
     /**
-     * Mod 11 helper.
-     *
      * @param array<int,int> $digits
      * @param array<int,int> $weights
-     * @return int
      */
     private function dvMod11Lt2Eq0(array $digits, array $weights): int
     {

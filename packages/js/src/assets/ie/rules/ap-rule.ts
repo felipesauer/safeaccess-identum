@@ -1,5 +1,14 @@
 import { AbstractStateRule } from '../abstract-state-rule.js';
 
+/**
+ * Validates Amapá (AP) IE numbers.
+ *
+ * 9 digits, prefix 03. DV = 11 - ((sum + p) % 11) with range-based offsets p/d:
+ *  - [3000001..3017000]: p=5, d=0
+ *  - [3017001..3019022]: p=9, d=1
+ *  - otherwise: p=0, d=0
+ * DV=10 → 0; DV=11 → d.
+ */
 export class ApRule extends AbstractStateRule {
     execute(ie: string): boolean {
         const d = this.digits(ie);

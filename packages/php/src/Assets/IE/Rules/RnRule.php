@@ -6,14 +6,14 @@ namespace SafeAccess\Identum\Assets\IE\Rules;
 
 use SafeAccess\Identum\Assets\IE\AbstractStateRule;
 
+/**
+ * Validates Rio Grande do Norte (RN) IE numbers.
+ *
+ * 9 or 10 digits, prefix 20. Single Mod-11 DV (rest < 2 → 0).
+ * 9-digit: weights [9,8,7,6,5,4,3,2]; 10-digit: weights [10,9,8,7,6,5,4,3,2].
+ */
 final class RnRule extends AbstractStateRule
 {
-    /**
-     * Entry point for Rio Grande do Norte IE validation (9 or 10 digits, prefix 20).
-     *
-     * @param string $ie
-     * @return bool
-     */
     public function execute(string $ie): bool
     {
         $digits = $this->digits($ie);
@@ -37,11 +37,8 @@ final class RnRule extends AbstractStateRule
     }
 
     /**
-     * Mod 11 helper.
-     *
      * @param array<int,int> $digits
      * @param array<int,int> $weights
-     * @return int
      */
     private function dvMod11Lt2Eq0(array $digits, array $weights): int
     {

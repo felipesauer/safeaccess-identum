@@ -1,5 +1,11 @@
 import { AbstractStateRule } from '../abstract-state-rule.js';
 
+/**
+ * Validates Rio Grande do Norte (RN) IE numbers.
+ *
+ * 9 or 10 digits, prefix 20. Single Mod-11 DV (rest < 2 → 0).
+ * 9-digit: weights [9,8,7,6,5,4,3,2]; 10-digit: weights [10,9,8,7,6,5,4,3,2].
+ */
 export class RnRule extends AbstractStateRule {
     execute(ie: string): boolean {
         const d = this.digits(ie);

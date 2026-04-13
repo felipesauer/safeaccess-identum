@@ -6,16 +6,15 @@ namespace SafeAccess\Identum\Assets\IE\Rules;
 
 use SafeAccess\Identum\Assets\IE\AbstractStateRule;
 
+/**
+ * Validates Tocantins (TO) IE numbers.
+ *
+ * Accepts 9 or 11 digits. For 11-digit IEs, positions 3-4 carry an era code
+ * (01, 02, 03, 99) that is stripped before applying the Mod-11 DV.
+ * DV policy: rest < 2 → 0; else 11 - rest. Weights [9,8,7,6,5,4,3,2].
+ */
 final class ToRule extends AbstractStateRule
 {
-    /**
-     * Entry point for Tocantins IE validation.
-     * Accepted lengths: 9 or 11.
-     * For 11-digit IE, ignore positions 3-4 if they are in {01,02,03,99} when computing the DV.
-     *
-     * @param string $ie
-     * @return bool
-     */
     public function execute(string $ie): bool
     {
         $digits = $this->digits($ie);
@@ -41,11 +40,8 @@ final class ToRule extends AbstractStateRule
     }
 
     /**
-     * Mod 11 helper.
-     *
      * @param array<int,int> $digits
      * @param array<int,int> $weights
-     * @return int
      */
     private function dvMod11Lt2Eq0(array $digits, array $weights): int
     {

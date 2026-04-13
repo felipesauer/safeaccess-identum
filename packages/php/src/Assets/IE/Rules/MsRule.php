@@ -6,14 +6,9 @@ namespace SafeAccess\Identum\Assets\IE\Rules;
 
 use SafeAccess\Identum\Assets\IE\AbstractStateRule;
 
+/** Validates Mato Grosso do Sul (MS) IE numbers. 9 digits, prefix 28, single Mod-11 DV (rest < 2 → 0). */
 final class MsRule extends AbstractStateRule
 {
-    /**
-     * Entry point for Mato Grosso do Sul IE validation (9 digits, prefix 28).
-     *
-     * @param string $ie
-     * @return bool
-     */
     public function execute(string $ie): bool
     {
         $digits = $this->digits($ie);
@@ -31,12 +26,10 @@ final class MsRule extends AbstractStateRule
         return (int) $digits[8] === $dv;
     }
 
+    /** @param array<int,int> $digits @param array<int,int> $weights */
     /**
-     * Mod 11 helper.
-     *
      * @param array<int,int> $digits
      * @param array<int,int> $weights
-     * @return int
      */
     private function dvMod11Lt2Eq0(array $digits, array $weights): int
     {

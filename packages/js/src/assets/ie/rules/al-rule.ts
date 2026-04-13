@@ -1,5 +1,6 @@
 import { AbstractStateRule } from '../abstract-state-rule.js';
 
+/** Validates Alagoas (AL) IE numbers. 9 digits, prefix 24. DV = (sum × 10) % 11; if result is 10 → DV = 0. Weights [9,8,7,6,5,4,3,2] over first 8 digits. */
 export class AlRule extends AbstractStateRule {
     execute(ie: string): boolean {
         const d = this.digits(ie);

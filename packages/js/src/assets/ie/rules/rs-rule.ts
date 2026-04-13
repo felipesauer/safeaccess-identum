@@ -1,5 +1,6 @@
 import { AbstractStateRule } from '../abstract-state-rule.js';
 
+/** Validates Rio Grande do Sul (RS) IE numbers. 10 digits, single Mod-11 DV (rest < 2 → 0). */
 export class RsRule extends AbstractStateRule {
     execute(ie: string): boolean {
         const d = this.digits(ie);

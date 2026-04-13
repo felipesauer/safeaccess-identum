@@ -1,5 +1,12 @@
 import { AbstractStateRule } from '../abstract-state-rule.js';
 
+/**
+ * Validates Minas Gerais (MG) IE numbers.
+ *
+ * 13 digits. DV1 uses Mod-10 digit-sum with alternating 1/2 weights
+ * over a 12-char auxiliary string formed by inserting '0' at position 4.
+ * DV2 uses Mod-11 with weights [3,2,11,10,9,8,7,6,5,4,3,2] over 11 digits + DV1.
+ */
 export class MgRule extends AbstractStateRule {
     execute(ie: string): boolean {
         const d = this.digits(ie);

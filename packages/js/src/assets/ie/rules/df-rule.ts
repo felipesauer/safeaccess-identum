@@ -1,5 +1,12 @@
 import { AbstractStateRule } from '../abstract-state-rule.js';
 
+/**
+ * Validates Distrito Federal (DF) IE numbers.
+ *
+ * 13 digits, prefix 07. Two Mod-11 DVs (rest < 2 → 0):
+ *  - DV1: weights [4,3,2,9,8,7,6,5,4,3,2] over first 11 digits
+ *  - DV2: weights [5,4,3,2,9,8,7,6,5,4,3,2] over first 11 digits + DV1
+ */
 export class DfRule extends AbstractStateRule {
     execute(ie: string): boolean {
         const d = this.digits(ie);

@@ -1,5 +1,12 @@
 import { AbstractStateRule } from '../abstract-state-rule.js';
 
+/**
+ * Validates Paraná (PR) IE numbers.
+ *
+ * 10 digits, two Mod-11 DVs (rest < 2 → 0):
+ *  - DV1: weights [3,2,7,6,5,4,3,2] over first 8 digits
+ *  - DV2: weights [4,3,2,7,6,5,4,3,2] over first 9 digits
+ */
 export class PrRule extends AbstractStateRule {
     execute(ie: string): boolean {
         const d = this.digits(ie);

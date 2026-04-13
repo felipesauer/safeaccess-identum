@@ -6,14 +6,9 @@ namespace SafeAccess\Identum\Assets\IE\Rules;
 
 use SafeAccess\Identum\Assets\IE\AbstractStateRule;
 
+/** Validates Piauí (PI) IE numbers. 9 digits, single Mod-11 DV (rest < 2 → 0). */
 final class PiRule extends AbstractStateRule
 {
-    /**
-     * Entry point for Piauí IE validation (9 digits).
-     *
-     * @param string $ie
-     * @return bool
-     */
     public function execute(string $ie): bool
     {
         $digits = $this->digits($ie);
@@ -28,11 +23,8 @@ final class PiRule extends AbstractStateRule
     }
 
     /**
-     * Mod 11 helper.
-     *
      * @param array<int,int> $digits
      * @param array<int,int> $weights
-     * @return int
      */
     private function dvMod11Lt2Eq0(array $digits, array $weights): int
     {

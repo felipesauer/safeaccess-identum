@@ -6,14 +6,9 @@ namespace SafeAccess\Identum\Assets\IE\Rules;
 
 use SafeAccess\Identum\Assets\IE\AbstractStateRule;
 
+/** Validates Rio de Janeiro (RJ) IE numbers. 8 digits, single Mod-11 DV (rest < 2 → 0). */
 final class RjRule extends AbstractStateRule
 {
-    /**
-     * Entry point for Rio de Janeiro IE validation (8 digits).
-     *
-     * @param string $ie
-     * @return bool
-     */
     public function execute(string $ie): bool
     {
         $digits = $this->digits($ie);
@@ -26,11 +21,8 @@ final class RjRule extends AbstractStateRule
     }
 
     /**
-     * Mod 11 helper.
-     *
      * @param array<int,int> $digits
      * @param array<int,int> $weights
-     * @return int
      */
     private function dvMod11Lt2Eq0(array $digits, array $weights): int
     {

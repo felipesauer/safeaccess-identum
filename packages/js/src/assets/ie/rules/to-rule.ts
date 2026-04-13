@@ -1,5 +1,12 @@
 import { AbstractStateRule } from '../abstract-state-rule.js';
 
+/**
+ * Validates Tocantins (TO) IE numbers.
+ *
+ * Accepts 9 or 11 digits. For 11-digit IEs, positions 3-4 carry an era code
+ * (01, 02, 03, 99) that is stripped before applying the Mod-11 DV.
+ * DV policy: rest < 2 → 0; else 11 - rest. Weights [9,8,7,6,5,4,3,2].
+ */
 export class ToRule extends AbstractStateRule {
     execute(ie: string): boolean {
         const d = this.digits(ie);

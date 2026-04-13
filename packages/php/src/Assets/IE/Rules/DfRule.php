@@ -6,19 +6,15 @@ namespace SafeAccess\Identum\Assets\IE\Rules;
 
 use SafeAccess\Identum\Assets\IE\AbstractStateRule;
 
+/**
+ * Validates Distrito Federal (DF) IE numbers.
+ *
+ * 13 digits, prefix 07. Two Mod-11 DVs (rest < 2 → 0):
+ *  - DV1: weights [4,3,2,9,8,7,6,5,4,3,2] over first 11 digits
+ *  - DV2: weights [5,4,3,2,9,8,7,6,5,4,3,2] over first 11 digits + DV1
+ */
 final class DfRule extends AbstractStateRule
 {
-    /**
-     * Entry point for Distrito Federal IE validation.
-     *
-     * Requirements:
-     * - 13 digits after normalization
-     * - Must start with "07"
-     * - Two DVs (positions 12 and 13)
-     *
-     * @param string $ie
-     * @return bool
-     */
     public function execute(string $ie): bool
     {
         $digits = $this->digits($ie);
@@ -45,11 +41,8 @@ final class DfRule extends AbstractStateRule
     }
 
     /**
-     * Mod 11 helper (rest < 2 => 0; else 11 - rest)
-     *
      * @param array<int,int> $digits
      * @param array<int,int> $weights
-     * @return int
      */
     private function dvMod11Lt2Eq0(array $digits, array $weights): int
     {

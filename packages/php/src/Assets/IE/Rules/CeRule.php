@@ -6,14 +6,9 @@ namespace SafeAccess\Identum\Assets\IE\Rules;
 
 use SafeAccess\Identum\Assets\IE\AbstractStateRule;
 
+/** Validates Ceará (CE) IE numbers. 9 digits, single Mod-11 DV (rest < 2 → 0). */
 final class CeRule extends AbstractStateRule
 {
-    /**
-     * Entry point for Ceará IE validation.
-     *
-     * @param string $ie
-     * @return bool
-     */
     public function execute(string $ie): bool
     {
         $digits = $this->digits($ie);
@@ -28,11 +23,8 @@ final class CeRule extends AbstractStateRule
     }
 
     /**
-     * Mod 11: if rest < 2 => 0; else 11 - rest.
-     *
      * @param array<int,int> $digits
      * @param array<int,int> $weights
-     * @return int
      */
     private function dvMod11Lt2Eq0(array $digits, array $weights): int
     {

@@ -1,5 +1,13 @@
 import { AbstractStateRule } from '../abstract-state-rule.js';
 
+/**
+ * Validates Rondônia (RO) IE numbers.
+ *
+ * Two accepted formats:
+ *  - 14 digits (current): single DV, Mod-11 rest < 2 → 0, weights [6,5,4,3,2,9,8,7,6,5,4,3,2]
+ *  - 9 digits (legacy): 3-digit municipality code + 5-digit company code + 1 DV.
+ *    DV = 11 - (sum % 11); if DV ≥ 10, subtract 10 (maps to 0 or 1).
+ */
 export class RoRule extends AbstractStateRule {
     execute(ie: string): boolean {
         const d = this.digits(ie);

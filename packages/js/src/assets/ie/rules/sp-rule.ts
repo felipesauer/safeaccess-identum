@@ -1,5 +1,13 @@
 import { AbstractStateRule } from '../abstract-state-rule.js';
 
+/**
+ * Validates São Paulo (SP) IE numbers.
+ *
+ * Two variants (12 digits each):
+ *  - Commercial/Industrial: two DVs. DV policy: (sum % 11); if 10 → 0.
+ *    DV1 weights [1,3,4,5,6,7,8,10]; DV2 weights [3,2,10,9,8,7,6,5,4,3,2].
+ *  - Rural producer: IE string starts with 'P'. Single DV over the 8-digit numeric base.
+ */
 export class SpRule extends AbstractStateRule {
     execute(ie: string): boolean {
         const raw = ie.toUpperCase().trim();

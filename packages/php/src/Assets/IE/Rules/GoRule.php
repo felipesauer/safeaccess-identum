@@ -6,16 +6,14 @@ namespace SafeAccess\Identum\Assets\IE\Rules;
 
 use SafeAccess\Identum\Assets\IE\AbstractStateRule;
 
+/**
+ * Validates Goiás (GO) IE numbers.
+ *
+ * 9 digits. Standard Mod-11 DV with a special rule when remainder == 1:
+ * if the 8-digit base falls in [10103105..10119997], DV = 1; otherwise DV = 0.
+ */
 final class GoRule extends AbstractStateRule
 {
-    /**
-     * Entry point for Goiás IE validation (9 digits).
-     *
-     * Special rule when remainder == 1 for range [10103105 .. 10119997].
-     *
-     * @param string $ie
-     * @return bool
-     */
     public function execute(string $ie): bool
     {
         $digits = $this->digits($ie);

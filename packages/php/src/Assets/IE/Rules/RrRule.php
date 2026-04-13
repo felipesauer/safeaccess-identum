@@ -6,14 +6,13 @@ namespace SafeAccess\Identum\Assets\IE\Rules;
 
 use SafeAccess\Identum\Assets\IE\AbstractStateRule;
 
+/**
+ * Validates Roraima (RR) IE numbers.
+ *
+ * 9 digits. DV = sum % 9 with weights [1,2,3,4,5,6,7,8] over first 8 digits.
+ */
 final class RrRule extends AbstractStateRule
 {
-    /**
-     * Entry point for Roraima IE validation (9 digits, Mod 9).
-     *
-     * @param string $ie
-     * @return bool
-     */
     public function execute(string $ie): bool
     {
         $digits = $this->digits($ie);

@@ -1,5 +1,6 @@
 import { AbstractStateRule } from '../abstract-state-rule.js';
 
+/** Validates Mato Grosso do Sul (MS) IE numbers. 9 digits, prefix 28, single Mod-11 DV (rest < 2 → 0). */
 export class MsRule extends AbstractStateRule {
     execute(ie: string): boolean {
         const d = this.digits(ie);

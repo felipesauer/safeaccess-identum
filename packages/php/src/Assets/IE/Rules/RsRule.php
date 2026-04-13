@@ -6,14 +6,9 @@ namespace SafeAccess\Identum\Assets\IE\Rules;
 
 use SafeAccess\Identum\Assets\IE\AbstractStateRule;
 
+/** Validates Rio Grande do Sul (RS) IE numbers. 10 digits, single Mod-11 DV (rest < 2 → 0). */
 final class RsRule extends AbstractStateRule
 {
-    /**
-     * Entry point for Rio Grande do Sul IE validation (10 digits).
-     *
-     * @param string $ie
-     * @return bool
-     */
     public function execute(string $ie): bool
     {
         $digits = $this->digits($ie);
@@ -26,11 +21,8 @@ final class RsRule extends AbstractStateRule
     }
 
     /**
-     * Mod 11 helper.
-     *
      * @param array<int,int> $digits
      * @param array<int,int> $weights
-     * @return int
      */
     private function dvMod11Lt2Eq0(array $digits, array $weights): int
     {
