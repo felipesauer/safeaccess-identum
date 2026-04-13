@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use SafeAccess\Identum\Identum;
 use SafeAccess\Identum\Assets\IE\StateEnum;
+use SafeAccess\Identum\Identum;
 
 describe(Identum::class, function () {
 

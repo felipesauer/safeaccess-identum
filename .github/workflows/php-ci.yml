@@ -25,6 +25,11 @@ jobs:
             matrix:
                 php: ["8.2", "8.3", "8.4"]
                 deps: ["core", "full"]
+                exclude:
+                    - php: "8.2"
+                      deps: "full"
+                    - php: "8.3"
+                      deps: "full"
 
         defaults:
             run:
@@ -59,7 +64,7 @@ jobs:
 
             - name: Upload coverage to Codecov
               if: matrix.php == '8.4' && matrix.deps == 'full'
-              uses: codecov/codecov-action@v4
+              uses: codecov/codecov-action@v5
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   flags: php
