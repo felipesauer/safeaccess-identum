@@ -4,6 +4,8 @@
 
 <h1 align="center">Safe Access Identum — PHP</h1>
 
+PHP library for validating Brazilian documents — CPF, CNPJ, CNH, CEP, CNS, PIS, IE (all 27 states), RENAVAM, Mercosul Plate, and Voter Title. Input sanitization by default. Zero production dependencies.
+
 <p align="center">
   <a href="https://packagist.org/packages/safeaccess/identum"><img src="https://img.shields.io/packagist/v/safeaccess/identum?label=packagist" alt="Packagist"></a>
   <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
@@ -14,8 +16,6 @@
 </p>
 
 ---
-
-PHP library for validating Brazilian documents — CPF, CNPJ, CNH, CEP, CNS, PIS, IE (all 27 states), RENAVAM, Mercosul Plate, and Voter Title. Input sanitization by default. Zero production dependencies.
 
 ## Features
 
