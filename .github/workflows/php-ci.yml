@@ -51,7 +51,7 @@ jobs:
               run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
             - name: Cache Composer dependencies
-              uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
+              uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
               with:
                   path: ${{ steps.composer-cache.outputs.dir }}
                   key: php-${{ matrix.php }}-${{ matrix.deps }}-composer-${{ hashFiles('packages/php/composer.lock') }}
@@ -66,7 +66,7 @@ jobs:
 
             - name: Upload coverage to Codecov
               if: matrix.php == '8.4' && matrix.deps == 'full'
-              uses: codecov/codecov-action@v5
+              uses: codecov/codecov-action@v6
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   flags: php
