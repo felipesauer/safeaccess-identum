@@ -4,6 +4,8 @@
 
 <h1 align="center">Safe Access Identum — TypeScript</h1>
 
+TypeScript/JavaScript library for validating Brazilian documents — CPF, CNPJ, CNH, CEP, CNS, PIS, IE (all 27 states), RENAVAM, Mercosul Plate, and Voter Title. ESM, input sanitization by default, zero production dependencies.
+
 <p align="center">
   <a href="https://www.npmjs.com/package/@safeaccess/identum"><img src="https://img.shields.io/npm/v/@safeaccess/identum?label=npm" alt="npm"></a>
   <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
@@ -14,8 +16,6 @@
 </p>
 
 ---
-
-TypeScript/JavaScript library for validating Brazilian documents — CPF, CNPJ, CNH, CEP, CNS, PIS, IE (all 27 states), RENAVAM, Mercosul Plate, and Voter Title. ESM, input sanitization by default, zero production dependencies.
 
 ## Features
 
