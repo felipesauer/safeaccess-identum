@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/felipesauer/safeaccess-identum/compare/php-v0.1.0...php-v0.1.1) (2026-04-21)
+
+
+### Miscellaneous Chores
+
+* **php:** Bump phpstan/phpstan from 2.1.46 to 2.1.50 in /packages/php in the dev-dependencies group ([#9](https://github.com/felipesauer/safeaccess-identum/issues/9)) ([da7e0a8](https://github.com/felipesauer/safeaccess-identum/commit/da7e0a8f73556ac14fb2a2b4602e0871b2a423db))
+
 ## 0.1.0 (2026-04-14)
 
 
