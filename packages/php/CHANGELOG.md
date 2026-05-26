@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/felipesauer/safeaccess-identum/compare/php-v0.1.3...php-v0.1.4) (2026-05-26)
+
+
+### Miscellaneous Chores
+
+* **php:** Bump the dev-dependencies group in /packages/php with 2 updates ([#24](https://github.com/felipesauer/safeaccess-identum/issues/24)) ([d86fc3c](https://github.com/felipesauer/safeaccess-identum/commit/d86fc3c5e563e6ff8a71e4250073fc68af80aca8))
+
 ## [0.1.3](https://github.com/felipesauer/safeaccess-identum/compare/php-v0.1.2...php-v0.1.3) (2026-05-05)
 
 
