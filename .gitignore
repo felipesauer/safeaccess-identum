@@ -29,6 +29,9 @@ node_modules/
 *.swo
 *~
 
+# Local analysis artifacts (not versioned)
+AUDIT.md
+
 # OS
 .DS_Store
 Thumbs.db
