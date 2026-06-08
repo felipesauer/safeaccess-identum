@@ -82,7 +82,7 @@ describe(CNPJValidation::class, function () {
 
     it('validateOrFail() throws when invalid', function () {
         expect(fn () => (new CNPJValidation('09387424300012'))->validateOrFail())
-            ->toThrow(ValidationException::class, 'input invalid');
+            ->toThrow(ValidationException::class, 'cnpj: input invalid');
     });
 
     it('validateOrFail() respects whitelist and blacklist', function () {

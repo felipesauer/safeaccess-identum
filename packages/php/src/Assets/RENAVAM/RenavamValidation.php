@@ -13,10 +13,15 @@ use SafeAccess\Identum\Contracts\AbstractValidatableDocument;
  */
 final class RenavamValidation extends AbstractValidatableDocument
 {
+    protected function documentName(): string
+    {
+        return 'renavam';
+    }
+
     protected function doValidate(): bool
     {
         // Strip all non-digit characters to get a clean numeric string
-        $digits = preg_replace('/\D+/', '', $this->raw()) ?? '';
+        $digits = $this->sanitize($this->raw());
 
         // RENAVAM must have exactly 11 digits
         if (strlen($digits) !== 11) {

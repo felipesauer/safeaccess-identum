@@ -91,6 +91,6 @@ describe(Identum::class, function () {
     it('returned validator supports validateOrFail()', function () {
         expect(Identum::cpf('864.600.120-24')->validateOrFail())->toBeTrue();
         expect(fn () => Identum::cpf('323.543.123-43')->validateOrFail())
-            ->toThrow(\SafeAccess\Identum\Exceptions\ValidationException::class, 'input invalid');
+            ->toThrow(\SafeAccess\Identum\Exceptions\ValidationException::class, 'cpf: input invalid');
     });
 });

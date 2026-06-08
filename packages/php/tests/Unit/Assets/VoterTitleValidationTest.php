@@ -35,7 +35,7 @@ describe(VoterTitleValidation::class, function () {
         $rawValid = '123456781295';
         $b = (new VoterTitleValidation($rawValid))->blacklist([$rawValid]);
         expect($b->validate())->toBeFalse();
-        expect(fn () => $b->validateOrFail())->toThrow(ValidationException::class, 'input invalid');
+        expect(fn () => $b->validateOrFail())->toThrow(ValidationException::class, 'voter-title: input invalid');
     });
 
     it('hits the dv==10 -> 0 edge in dv1 and dv2', function () {

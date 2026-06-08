@@ -13,10 +13,15 @@ use SafeAccess\Identum\Contracts\AbstractValidatableDocument;
  */
 final class CNSValidation extends AbstractValidatableDocument
 {
+    protected function documentName(): string
+    {
+        return 'cns';
+    }
+
     protected function doValidate(): bool
     {
         // Strip all non-digit characters to get a clean numeric string
-        $digits = preg_replace('/\D+/', '', $this->raw()) ?? '';
+        $digits = $this->sanitize($this->raw());
 
         // CNS (National Health Card) must have exactly 15 digits
         if (strlen($digits) !== 15) {

@@ -13,10 +13,15 @@ use SafeAccess\Identum\Contracts\AbstractValidatableDocument;
  */
 final class CEPValidation extends AbstractValidatableDocument
 {
+    protected function documentName(): string
+    {
+        return 'cep';
+    }
+
     protected function doValidate(): bool
     {
         // Strip all non-digit characters to get a clean numeric string
-        $digits = preg_replace('/\D+/', '', $this->raw()) ?? '';
+        $digits = $this->sanitize($this->raw());
 
         // CEP (postal code) must have exactly 8 digits.
         // NOTE: This validator performs format validation only — range and locality rules

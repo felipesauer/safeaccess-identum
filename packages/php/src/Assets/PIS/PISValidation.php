@@ -13,10 +13,15 @@ use SafeAccess\Identum\Contracts\AbstractValidatableDocument;
  */
 final class PISValidation extends AbstractValidatableDocument
 {
+    protected function documentName(): string
+    {
+        return 'pis';
+    }
+
     protected function doValidate(): bool
     {
         // Strip all non-digit characters to get a clean numeric string
-        $digits = preg_replace('/\D+/', '', $this->raw()) ?? '';
+        $digits = $this->sanitize($this->raw());
 
         // PIS must have exactly 11 digits
         if (strlen($digits) !== 11) {

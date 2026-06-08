@@ -13,10 +13,15 @@ use SafeAccess\Identum\Contracts\AbstractValidatableDocument;
  */
 final class VoterTitleValidation extends AbstractValidatableDocument
 {
+    protected function documentName(): string
+    {
+        return 'voter-title';
+    }
+
     protected function doValidate(): bool
     {
         // Strip all non-digit characters to get a clean numeric string
-        $digits = preg_replace('/\D+/', '', $this->raw()) ?? '';
+        $digits = $this->sanitize($this->raw());
 
         // Voter Title must have exactly 12 digits
         if (strlen($digits) !== 12) {

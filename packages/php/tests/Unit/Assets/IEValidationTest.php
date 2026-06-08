@@ -307,7 +307,7 @@ describe(IEValidation::class, function () {
 
     it('validateOrFail() throws ValidationException when invalid', function () {
         expect(fn () => (new IEValidation('209644418', StateEnum::GO))->validateOrFail())
-            ->toThrow(ValidationException::class, 'input invalid');
+            ->toThrow(ValidationException::class, 'ie: input invalid');
     });
 
     it('validateOrFail() respects whitelist and blacklist', function () {

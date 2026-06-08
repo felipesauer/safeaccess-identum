@@ -13,10 +13,15 @@ use SafeAccess\Identum\Contracts\AbstractValidatableDocument;
  */
 final class CNHValidation extends AbstractValidatableDocument
 {
+    protected function documentName(): string
+    {
+        return 'cnh';
+    }
+
     protected function doValidate(): bool
     {
         // Strip all non-digit characters to get a clean numeric string
-        $digits = preg_replace('/\D+/', '', $this->raw()) ?? '';
+        $digits = $this->sanitize($this->raw());
 
         // CNH must have exactly 11 digits
         if (strlen($digits) !== 11) {

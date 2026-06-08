@@ -31,7 +31,7 @@ describe(CNSValidation::class, function () {
         $valid = '100000000000007';
         $blk  = (new CNSValidation($valid))->blacklist([$valid]);
         expect($blk->validate())->toBeFalse();
-        expect(fn () => $blk->validateOrFail())->toThrow(ValidationException::class, 'input invalid');
+        expect(fn () => $blk->validateOrFail())->toThrow(ValidationException::class, 'cns: input invalid');
     });
 
     it('covers the dv==10 branch for 1/2 starters explicitly', function () {

@@ -15,6 +15,11 @@ use SafeAccess\Identum\Contracts\AbstractValidatableDocument;
  */
 final class CPFValidation extends AbstractValidatableDocument
 {
+    protected function documentName(): string
+    {
+        return 'cpf';
+    }
+
     /**
      * Domain validation for CPF:
      * - Must have 11 digits
@@ -26,7 +31,7 @@ final class CPFValidation extends AbstractValidatableDocument
     protected function doValidate(): bool
     {
         // Strip all non-digit characters to get a clean numeric string
-        $digits = preg_replace('/\D+/', '', $this->raw()) ?? '';
+        $digits = $this->sanitize($this->raw());
 
         // CPF must have exactly 11 digits
         if (strlen($digits) !== 11) {

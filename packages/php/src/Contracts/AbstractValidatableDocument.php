@@ -78,7 +78,7 @@ abstract class AbstractValidatableDocument implements ValidatableDocument
     public function validateOrFail(): true
     {
         if (!$this->validate()) {
-            throw new ValidationException('input invalid');
+            throw new ValidationException($this->documentName() . ': input invalid');
         }
 
         return true;
@@ -86,13 +86,31 @@ abstract class AbstractValidatableDocument implements ValidatableDocument
 
     abstract protected function doValidate(): bool;
 
+    /**
+     * Short identifier of the document type, used in error messages
+     * (e.g., "cpf", "cnpj"). Must match the JS counterpart.
+     */
+    abstract protected function documentName(): string;
+
+    /**
+     * Normalizes a value for comparison and validation.
+     *
+     * Default: strips every non-digit character. Validators whose format keeps
+     * letters (e.g., alphanumeric CNPJ, Mercosul plate) override this.
+     */
+    protected function sanitize(string $value): string
+    {
+        return preg_replace('/\D+/', '', $value) ?? '';
+    }
+
+    /** Whitelist/blacklist comparisons are format-agnostic: both sides are sanitized first. */
     protected function isBlacklisted(string $value): bool
     {
-        return in_array($value, $this->blacklist, true);
+        return in_array($this->sanitize($value), array_map($this->sanitize(...), $this->blacklist), true);
     }
 
     protected function isWhitelisted(string $value): bool
     {
-        return in_array($value, $this->whitelist, true);
+        return in_array($this->sanitize($value), array_map($this->sanitize(...), $this->whitelist), true);
     }
 }

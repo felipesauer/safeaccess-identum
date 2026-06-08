@@ -85,6 +85,11 @@ final class IEValidation extends AbstractValidatableDocumentRules
         return $this;
     }
 
+    protected function documentName(): string
+    {
+        return 'ie';
+    }
+
     /**
      * {@inheritDoc}
      */

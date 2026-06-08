@@ -13,12 +13,23 @@ use SafeAccess\Identum\Contracts\AbstractValidatableDocument;
  */
 final class PlateMercosulValidation extends AbstractValidatableDocument
 {
+    protected function documentName(): string
+    {
+        return 'plate';
+    }
+
+    /**
+     * Plates are alphanumeric, so they cannot strip to digits only.
+     * Uppercases and removes every non-alphanumeric character (dashes, spaces).
+     */
+    protected function sanitize(string $value): string
+    {
+        return preg_replace('/[^A-Z0-9]/', '', strtoupper(trim($value))) ?? '';
+    }
+
     protected function doValidate(): bool
     {
-        // Normalize to uppercase and strip separators (dashes, spaces)
-        $value = strtoupper(trim($this->raw()));
-        // Remote any non-alphanumeric characters (e.g., dashes, spaces in LLLNLNN format)
-        $value = preg_replace('/[^A-Z0-9]/', '', $value) ?? '';
+        $value = $this->sanitize($this->raw());
 
         // Mercosul plate format: LLLNLNN (3 letters + 1 digit + 1 letter + 2 digits = 7 total characters)
         // Example: BRA1A23
