@@ -25,7 +25,7 @@ describe(CNSValidation.name, () => {
         const bl = new CNSValidation('100000000000007').blacklist(['100000000000007']);
         expect(bl.validate()).toBe(false);
         expect(() => bl.validateOrFail()).toThrow(ValidationException);
-        expect(() => bl.validateOrFail()).toThrow('input invalid');
+        expect(() => bl.validateOrFail()).toThrow('cns: input invalid');
     });
 
     it('covers the dv==10 branch for 1/2 starters explicitly', () => {

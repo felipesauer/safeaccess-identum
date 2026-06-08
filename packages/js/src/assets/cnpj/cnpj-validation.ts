@@ -6,11 +6,21 @@ import { AbstractValidatableDocument } from '../../contracts/abstract-validatabl
  * Supports both numeric and alphanumeric CNPJ formats.
  */
 export class CNPJValidation extends AbstractValidatableDocument {
+    protected documentName(): string {
+        return 'cnpj';
+    }
+
+    /**
+     * CNPJ keeps letters (alphanumeric format), so it cannot strip to digits only.
+     * Uppercases and removes only formatting separators; other characters are
+     * preserved so they are caught as invalid during validation.
+     */
+    protected sanitize(value: string): string {
+        return value.toUpperCase().replace(/[\s.\-/]/g, '');
+    }
+
     protected doValidate(): boolean {
-        const raw = this._raw.toUpperCase();
-        // Strip common formatting separators (dot, dash, slash) and whitespace.
-        // Preserve other characters to catch them as invalid during validation.
-        const txt = raw.replace(/[\s.\-/]/g, '');
+        const txt = this.sanitize(this._raw);
 
         // Guard: CNPJ must be exactly 14 characters long
         if (txt.length !== 14) {

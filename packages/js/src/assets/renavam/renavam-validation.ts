@@ -4,9 +4,13 @@ import { AbstractValidatableDocument } from '../../contracts/abstract-validatabl
  * Validates Brazilian RENAVAM (Registro Nacional de Veículos Automotores) numbers.
  */
 export class RenavamValidation extends AbstractValidatableDocument {
+    protected documentName(): string {
+        return 'renavam';
+    }
+
     protected doValidate(): boolean {
         // Strip all non-digit characters to get a clean numeric string
-        const digits = this._raw.replace(/\D+/g, '');
+        const digits = this.sanitize(this._raw);
 
         // RENAVAM must have exactly 11 digits
         if (digits.length !== 11) {

@@ -58,11 +58,11 @@ export abstract class AbstractValidatableDocument implements ValidatableDocument
     }
 
     validate(): boolean {
-        if (this._whitelist.includes(this._raw)) {
+        if (this.isWhitelisted(this._raw)) {
             return true;
         }
 
-        if (this._blacklist.includes(this._raw)) {
+        if (this.isBlacklisted(this._raw)) {
             return false;
         }
 
@@ -71,11 +71,38 @@ export abstract class AbstractValidatableDocument implements ValidatableDocument
 
     validateOrFail(): true {
         if (!this.validate()) {
-            throw new ValidationException('input invalid');
+            throw new ValidationException(`${this.documentName()}: input invalid`);
         }
 
         return true;
     }
 
     protected abstract doValidate(): boolean;
+
+    /**
+     * Short identifier of the document type, used in error messages
+     * (e.g., "cpf", "cnpj"). Must match the PHP counterpart.
+     */
+    protected abstract documentName(): string;
+
+    /**
+     * Normalizes a value for comparison and validation.
+     *
+     * Default: strips every non-digit character. Validators whose format keeps
+     * letters (e.g., alphanumeric CNPJ, Mercosul plate) override this.
+     */
+    protected sanitize(value: string): string {
+        return value.replace(/\D+/g, '');
+    }
+
+    /** Whitelist/blacklist comparisons are format-agnostic: both sides are sanitized first. */
+    protected isBlacklisted(value: string): boolean {
+        const target = this.sanitize(value);
+        return this._blacklist.some((entry) => this.sanitize(entry) === target);
+    }
+
+    protected isWhitelisted(value: string): boolean {
+        const target = this.sanitize(value);
+        return this._whitelist.some((entry) => this.sanitize(entry) === target);
+    }
 }

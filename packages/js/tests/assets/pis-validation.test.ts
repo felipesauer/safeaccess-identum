@@ -36,7 +36,7 @@ describe(PISValidation.name, () => {
         const bl = new PISValidation('19121693121').blacklist(['19121693121']);
         expect(bl.validate()).toBe(false);
         expect(() => bl.validateOrFail()).toThrow(ValidationException);
-        expect(() => bl.validateOrFail()).toThrow('input invalid');
+        expect(() => bl.validateOrFail()).toThrow('pis: input invalid');
     });
 
     it('validates diverse PIS numbers to kill weight mutations', () => {

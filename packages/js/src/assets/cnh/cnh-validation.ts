@@ -11,9 +11,13 @@ import { AbstractValidatableDocument } from '../../contracts/abstract-validatabl
  *     If final result > 9 → DV2 = 0.
  */
 export class CNHValidation extends AbstractValidatableDocument {
+    protected documentName(): string {
+        return 'cnh';
+    }
+
     protected doValidate(): boolean {
         // Strip all non-digit characters to get a clean numeric string
-        const digits = this._raw.replace(/\D+/g, '');
+        const digits = this.sanitize(this._raw);
 
         // CNH must have exactly 11 digits
         if (digits.length !== 11) {

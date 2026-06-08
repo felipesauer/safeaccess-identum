@@ -90,6 +90,13 @@ describe(CPFValidation.name, () => {
         expect(new CPFValidation('323.543.123-43').whitelist(['323.543.123-43']).validate()).toBe(true);
     });
 
+    it('whitelist()/blacklist() match regardless of formatting (both sides sanitized)', () => {
+        // masked input vs unmasked list entry
+        expect(new CPFValidation('323.543.123-43').whitelist(['32354312343']).validate()).toBe(true);
+        // unmasked input vs masked list entry
+        expect(new CPFValidation('86460012024').blacklist(['864.600.120-24']).validate()).toBe(false);
+    });
+
     it('blacklist() overrides valid result', () => {
         expect(new CPFValidation('864.600.120-24').blacklist(['864.600.120-24']).validate()).toBe(false);
     });
@@ -100,7 +107,7 @@ describe(CPFValidation.name, () => {
 
     it('validateOrFail() throws ValidationException when invalid', () => {
         expect(() => new CPFValidation('323.543.123-43').validateOrFail()).toThrow(ValidationException);
-        expect(() => new CPFValidation('323.543.123-43').validateOrFail()).toThrow('input invalid');
+        expect(() => new CPFValidation('323.543.123-43').validateOrFail()).toThrow('cpf: input invalid');
     });
 
     it('validateOrFail() respects whitelist and blacklist', () => {

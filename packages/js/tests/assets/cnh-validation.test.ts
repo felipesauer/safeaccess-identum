@@ -31,13 +31,13 @@ describe(CNHValidation.name, () => {
         const v = new CNHValidation('22522791508').blacklist(['22522791508']);
         expect(v.validate()).toBe(false);
         expect(() => v.validateOrFail()).toThrow(ValidationException);
-        expect(() => v.validateOrFail()).toThrow('input invalid');
+        expect(() => v.validateOrFail()).toThrow('cnh: input invalid');
     });
 
     it('validateOrFail returns true for valid and throws for invalid', () => {
         expect(new CNHValidation('12345678900').validateOrFail()).toBe(true);
         expect(() => new CNHValidation('92079525000').validateOrFail()).toThrow(ValidationException);
-        expect(() => new CNHValidation('92079525000').validateOrFail()).toThrow('input invalid');
+        expect(() => new CNHValidation('92079525000').validateOrFail()).toThrow('cnh: input invalid');
     });
 
     it('hits the dv2 adjustment branch (dv1=10→0 and dv2-2<0 → +9)', () => {

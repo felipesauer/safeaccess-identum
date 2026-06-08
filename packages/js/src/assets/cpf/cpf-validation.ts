@@ -6,9 +6,13 @@ import { AbstractValidatableDocument } from '../../contracts/abstract-validatabl
  * Applies Mod11 check-digit algorithm with two verification digits.
  */
 export class CPFValidation extends AbstractValidatableDocument {
+    protected documentName(): string {
+        return 'cpf';
+    }
+
     protected doValidate(): boolean {
         // Strip all non-digit characters to get a clean numeric string
-        const digits = this._raw.replace(/\D+/g, '');
+        const digits = this.sanitize(this._raw);
 
         // CPF must have exactly 11 digits
         if (digits.length !== 11) {

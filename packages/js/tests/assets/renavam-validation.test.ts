@@ -35,7 +35,7 @@ describe(RenavamValidation.name, () => {
         const bl = new RenavamValidation('60390908553').blacklist(['60390908553']);
         expect(bl.validate()).toBe(false);
         expect(() => bl.validateOrFail()).toThrow(ValidationException);
-        expect(() => bl.validateOrFail()).toThrow('input invalid');
+        expect(() => bl.validateOrFail()).toThrow('renavam: input invalid');
     });
 
     it('hits dv>=10 branch and coerces dv to 0', () => {

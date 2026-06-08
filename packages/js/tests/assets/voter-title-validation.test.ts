@@ -28,7 +28,7 @@ describe(VoterTitleValidation.name, () => {
         const bl = new VoterTitleValidation('123456781295').blacklist(['123456781295']);
         expect(bl.validate()).toBe(false);
         expect(() => bl.validateOrFail()).toThrow(ValidationException);
-        expect(() => bl.validateOrFail()).toThrow('input invalid');
+        expect(() => bl.validateOrFail()).toThrow('voter-title: input invalid');
     });
 
     it('hits the dv==10 -> 0 edge in dv1 and dv2', () => {
