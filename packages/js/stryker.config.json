@@ -16,8 +16,11 @@
     "concurrency": 4,
     "incremental": true,
     "incrementalFile": "reports/stryker/.incremental.json",
-    "reporters": ["json", "progress"],
+    "reporters": ["json", "progress", "dashboard"],
     "jsonReporter": {
         "fileName": "reports/stryker/mutation.json"
+    },
+    "dashboard": {
+        "reportType": "full"
     }
 }
