@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/felipesauer/safeaccess-identum/compare/php-v0.1.5...php-v0.1.6) (2026-06-08)
+
+
+### Features
+
+* enforce real PHP/JS parity, format-agnostic allow/deny lists, typed errors ([#33](https://github.com/felipesauer/safeaccess-identum/issues/33)) ([57cb356](https://github.com/felipesauer/safeaccess-identum/commit/57cb356c97f6f27bc07262c839bfea33cdac4b50))
+
 ## [0.1.5](https://github.com/felipesauer/safeaccess-identum/compare/php-v0.1.4...php-v0.1.5) (2026-06-03)
 
 
