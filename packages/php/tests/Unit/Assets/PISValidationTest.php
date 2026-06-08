@@ -49,6 +49,6 @@ describe(PISValidation::class, function () {
         $rawValid = '19121693121';
         $b = (new PISValidation($rawValid))->blacklist([$rawValid]);
         expect($b->validate())->toBeFalse();
-        expect(fn () => $b->validateOrFail())->toThrow(ValidationException::class, 'input invalid');
+        expect(fn () => $b->validateOrFail())->toThrow(ValidationException::class, 'pis: input invalid');
     });
 });

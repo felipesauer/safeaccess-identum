@@ -4,9 +4,13 @@ import { AbstractValidatableDocument } from '../../contracts/abstract-validatabl
  * Validates Brazilian Voter Title (Título de Eleitor) numbers.
  */
 export class VoterTitleValidation extends AbstractValidatableDocument {
+    protected documentName(): string {
+        return 'voter-title';
+    }
+
     protected doValidate(): boolean {
         // Strip all non-digit characters to get a clean numeric string
-        const digits = this._raw.replace(/\D+/g, '');
+        const digits = this.sanitize(this._raw);
 
         // Voter Title must have exactly 12 digits
         if (digits.length !== 12) {

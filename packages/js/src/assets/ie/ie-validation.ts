@@ -94,6 +94,10 @@ export class IEValidation extends AbstractValidatableDocumentRules {
         return this;
     }
 
+    protected documentName(): string {
+        return 'ie';
+    }
+
     protected doValidate(): boolean {
         return this.rule.execute(this._raw);
     }

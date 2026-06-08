@@ -4,9 +4,13 @@ import { AbstractValidatableDocument } from '../../contracts/abstract-validatabl
  * Validates Brazilian CEP (Código de Endereçamento Postal) numbers.
  */
 export class CEPValidation extends AbstractValidatableDocument {
+    protected documentName(): string {
+        return 'cep';
+    }
+
     protected doValidate(): boolean {
         // Strip all non-digit characters to get a clean numeric string
-        const digits = this._raw.replace(/\D+/g, '');
+        const digits = this.sanitize(this._raw);
 
         // CEP (postal code) must have exactly 8 digits.
         // NOTE: This validator performs format validation only — range and locality rules

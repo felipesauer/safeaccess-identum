@@ -46,7 +46,7 @@ describe(RenavamValidation::class, function () {
         $rawValid = '60390908553';
         $b = (new RenavamValidation($rawValid))->blacklist([$rawValid]);
         expect($b->validate())->toBeFalse();
-        expect(fn () => $b->validateOrFail())->toThrow(ValidationException::class, 'input invalid');
+        expect(fn () => $b->validateOrFail())->toThrow(ValidationException::class, 'renavam: input invalid');
     });
 
     it('hits dv>=10 branch and coerces dv to 0', function () {

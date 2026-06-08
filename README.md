@@ -57,9 +57,9 @@ The same API in TypeScript, identical output for identical input.
 - **PHP + TypeScript** — same public API, same checksum logic, same sanitization rules, same output for the same input
 - **IE all 27 states** — every state algorithm implemented, tested with edge cases in both packages
 - **Input sanitization by default** — `'529.982.247-25'` and `'52998224725'` both just work
-- **`validateOrFail()`** — throws a typed `ValidationException` instead of returning `false`
-- **Blacklist / whitelist** — force-accept or force-reject specific values, useful for test environments and exceptional business rules
-- **100% line + branch coverage** — Pest + Infection (PHP) · Vitest + Stryker (TypeScript)
+- **`validateOrFail()`** — throws a typed `ValidationException` whose message is prefixed with the document type (e.g. `cpf: input invalid`)
+- **Blacklist / whitelist** — force-accept or force-reject specific values (format-agnostic: both input and list entries are sanitized before matching). Whitelist takes precedence over blacklist
+- **100% line & function coverage** (branch coverage enforced at 95%+) — Pest + Infection (PHP) · Vitest + Stryker (TypeScript), mutation MSI ≥ 85%
 - **Zero production dependencies**
 
 ## Packages
@@ -118,8 +118,8 @@ try {
     // handle invalid document
 }
 
-// Blacklist / whitelist
-Identum::cpf('529.982.247-25')->blacklist(['529.982.247-25'])->validate(); // false
+// Blacklist / whitelist (format-agnostic: input and list entries are sanitized before matching)
+Identum::cpf('529.982.247-25')->blacklist(['52998224725'])->validate(); // false — matches despite the mask
 Identum::cpf('000.000.000-00')->whitelist(['000.000.000-00'])->validate(); // true
 ```
 
@@ -150,8 +150,8 @@ try {
     }
 }
 
-// Blacklist / whitelist
-Identum.cpf('529.982.247-25').blacklist(['529.982.247-25']).validate(); // false
+// Blacklist / whitelist (format-agnostic: input and list entries are sanitized before matching)
+Identum.cpf('529.982.247-25').blacklist(['52998224725']).validate(); // false — matches despite the mask
 Identum.cpf('000.000.000-00').whitelist(['000.000.000-00']).validate(); // true
 ```
 
@@ -162,11 +162,11 @@ All validator classes share the same fluent interface after construction:
 | Method | PHP return | TS return | Description |
 | --- | --- | --- | --- |
 | `validate()` | `bool` | `boolean` | Returns `true` if valid, `false` otherwise |
-| `validateOrFail()` | `bool` | `boolean` | Returns `true` if valid, throws `ValidationException` otherwise |
+| `validateOrFail()` | `bool` | `boolean` | Returns `true` if valid, throws `ValidationException` (message prefixed with the document type) otherwise |
 | `blacklist(string[])` | `static` | `this` | Force-reject the given values regardless of checksum |
 | `whitelist(string[])` | `static` | `this` | Force-accept the given values regardless of checksum |
 
-`blacklist()` and `whitelist()` are fluent and can be chained before `validate()` or `validateOrFail()`.
+`blacklist()` and `whitelist()` are fluent and can be chained before `validate()` or `validateOrFail()`. Matching is **format-agnostic** — both the input and the list entries are passed through the same sanitization the validator uses, so `'529.982.247-25'` matches a list entry of `'52998224725'`. When a value appears in both lists, **whitelist wins**.
 
 ## Supported documents
 

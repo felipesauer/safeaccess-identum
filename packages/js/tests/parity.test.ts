@@ -1,72 +1,96 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { Identum, StateEnum } from '../src/index.js';
 
 /**
  * Cross-language parity tests.
  *
- * These cases are the canonical ground truth that the PHP package must also
- * return for the same input.  The matching PHP test file lives at
- * packages/php/tests/Unit/ParityTest.php and must stay in sync with this file.
+ * The canonical ground truth lives in the repository-root `parity-vectors.json`,
+ * loaded by BOTH packages — this file and packages/php/tests/Unit/ParityTest.php.
+ * Add or change cases ONLY in that JSON so PHP and TypeScript can never drift.
  */
-describe('Parity — same input, same output in PHP and TypeScript', () => {
 
+interface ParityCase {
+    input: string;
+    valid: boolean;
+    state?: string;
+}
+
+const vectorsPath = fileURLToPath(new URL('../../../parity-vectors.json', import.meta.url));
+const vectors = JSON.parse(readFileSync(vectorsPath, 'utf-8')) as Record<string, ParityCase[]>;
+
+const verb = (valid: boolean): string => (valid ? 'accepts' : 'rejects');
+
+describe('Parity — same input, same output in PHP and TypeScript', () => {
     describe('CPF', () => {
-        it('accepts a valid CPF (formatted)', () => expect(Identum.cpf('529.982.247-25').validate()).toBe(true));
-        it('accepts a valid CPF (digits only)', () => expect(Identum.cpf('52998224725').validate()).toBe(true));
-        it('rejects all-same-digit CPF', () => expect(Identum.cpf('111.111.111-11').validate()).toBe(false));
-        it('rejects invalid CPF', () => expect(Identum.cpf('000.000.000-00').validate()).toBe(false));
+        for (const c of vectors.cpf) {
+            it(`${verb(c.valid)} ${c.input}`, () =>
+                expect(Identum.cpf(c.input).validate()).toBe(c.valid));
+        }
     });
 
     describe('CNPJ', () => {
-        it('accepts a valid numeric CNPJ (formatted)', () => expect(Identum.cnpj('84.773.274/0001-03').validate()).toBe(true));
-        it('accepts a valid numeric CNPJ (digits only)', () => expect(Identum.cnpj('84773274000103').validate()).toBe(true));
-        it('accepts a valid alphanumeric CNPJ', () => expect(Identum.cnpj('A0000000000032').validate()).toBe(true));
-        it('rejects all-same-digit CNPJ', () => expect(Identum.cnpj('11.111.111/1111-11').validate()).toBe(false));
+        for (const c of vectors.cnpj) {
+            it(`${verb(c.valid)} ${c.input}`, () =>
+                expect(Identum.cnpj(c.input).validate()).toBe(c.valid));
+        }
     });
 
     describe('CNH', () => {
-        it('accepts a valid CNH', () => expect(Identum.cnh('22522791508').validate()).toBe(true));
-        it('rejects an invalid CNH', () => expect(Identum.cnh('00000000000').validate()).toBe(false));
+        for (const c of vectors.cnh) {
+            it(`${verb(c.valid)} ${c.input}`, () =>
+                expect(Identum.cnh(c.input).validate()).toBe(c.valid));
+        }
     });
 
     describe('CEP', () => {
-        it('accepts a valid CEP (formatted)', () => expect(Identum.cep('78000-000').validate()).toBe(true));
-        it('accepts a valid CEP (digits only)', () => expect(Identum.cep('78000000').validate()).toBe(true));
-        it('rejects a too-short CEP', () => expect(Identum.cep('1234567').validate()).toBe(false));
+        for (const c of vectors.cep) {
+            it(`${verb(c.valid)} ${c.input}`, () =>
+                expect(Identum.cep(c.input).validate()).toBe(c.valid));
+        }
     });
 
     describe('CNS', () => {
-        it('accepts a valid CNS (starts with 1)', () => expect(Identum.cns('100000000060018').validate()).toBe(true));
-        it('accepts a valid CNS (starts with 7)', () => expect(Identum.cns('700000000000005').validate()).toBe(true));
-        it('rejects an invalid CNS', () => expect(Identum.cns('000000000000000').validate()).toBe(false));
+        for (const c of vectors.cns) {
+            it(`${verb(c.valid)} ${c.input}`, () =>
+                expect(Identum.cns(c.input).validate()).toBe(c.valid));
+        }
     });
 
     describe('PIS', () => {
-        it('accepts a valid PIS (formatted)', () => expect(Identum.pis('329.9506.158-9').validate()).toBe(true));
-        it('accepts a valid PIS (digits only)', () => expect(Identum.pis('32995061589').validate()).toBe(true));
-        it('rejects an invalid PIS', () => expect(Identum.pis('00000000000').validate()).toBe(false));
+        for (const c of vectors.pis) {
+            it(`${verb(c.valid)} ${c.input}`, () =>
+                expect(Identum.pis(c.input).validate()).toBe(c.valid));
+        }
     });
 
     describe('IE', () => {
-        it('accepts a valid IE — SP', () => expect(Identum.ie('343173196450', StateEnum.SP).validate()).toBe(true));
-        it('accepts a valid IE — BA', () => expect(Identum.ie('153189458', StateEnum.BA).validate()).toBe(true));
-        it('accepts a valid IE — MG', () => expect(Identum.ie('7908930932562', StateEnum.MG).validate()).toBe(true));
-        it('rejects an invalid IE — SP', () => expect(Identum.ie('000000000000', StateEnum.SP).validate()).toBe(false));
+        for (const c of vectors.ie) {
+            const state = StateEnum[c.state as keyof typeof StateEnum];
+            it(`${verb(c.valid)} ${c.input} (${c.state})`, () =>
+                expect(Identum.ie(c.input, state).validate()).toBe(c.valid));
+        }
     });
 
     describe('RENAVAM', () => {
-        it('accepts a valid RENAVAM', () => expect(Identum.renavam('60390908553').validate()).toBe(true));
-        it('rejects an invalid RENAVAM', () => expect(Identum.renavam('00000000000').validate()).toBe(false));
+        for (const c of vectors.renavam) {
+            it(`${verb(c.valid)} ${c.input}`, () =>
+                expect(Identum.renavam(c.input).validate()).toBe(c.valid));
+        }
     });
 
     describe('Plate (Mercosul)', () => {
-        it('accepts a valid Mercosul plate', () => expect(Identum.placa('ABC1D23').validate()).toBe(true));
-        it('rejects an old-format plate (LLLDDD)', () => expect(Identum.placa('ABC1234').validate()).toBe(false));
+        for (const c of vectors.placa) {
+            it(`${verb(c.valid)} ${c.input}`, () =>
+                expect(Identum.placa(c.input).validate()).toBe(c.valid));
+        }
     });
 
     describe('Voter Title', () => {
-        it('accepts a valid Voter Title', () => expect(Identum.tituloEleitor('123456781295').validate()).toBe(true));
-        it('rejects an invalid Voter Title', () => expect(Identum.tituloEleitor('000000000000').validate()).toBe(false));
+        for (const c of vectors.tituloEleitor) {
+            it(`${verb(c.valid)} ${c.input}`, () =>
+                expect(Identum.tituloEleitor(c.input).validate()).toBe(c.valid));
+        }
     });
-
 });

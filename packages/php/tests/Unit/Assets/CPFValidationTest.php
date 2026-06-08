@@ -49,6 +49,13 @@ describe(CPFValidation::class, function () {
         expect((new CPFValidation('323.543.123-43'))->whitelist(['323.543.123-43'])->validate())->toBeTrue();
     });
 
+    it('whitelist()/blacklist() match regardless of formatting (both sides sanitized)', function () {
+        // masked input vs unmasked list entry
+        expect((new CPFValidation('323.543.123-43'))->whitelist(['32354312343'])->validate())->toBeTrue();
+        // unmasked input vs masked list entry
+        expect((new CPFValidation('86460012024'))->blacklist(['864.600.120-24'])->validate())->toBeFalse();
+    });
+
     it('blacklist() overrides valid result', function () {
         expect((new CPFValidation('864.600.120-24'))->blacklist(['864.600.120-24'])->validate())->toBeFalse();
     });
@@ -59,7 +66,7 @@ describe(CPFValidation::class, function () {
 
     it('validateOrFail() throws ValidationException when invalid', function () {
         expect(fn () => (new CPFValidation('323.543.123-43'))->validateOrFail())
-            ->toThrow(ValidationException::class, 'input invalid');
+            ->toThrow(ValidationException::class, 'cpf: input invalid');
     });
 
     it('validateOrFail() respects whitelist and blacklist', function () {

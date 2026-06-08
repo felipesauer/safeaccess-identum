@@ -4,9 +4,13 @@ import { AbstractValidatableDocument } from '../../contracts/abstract-validatabl
  * Validates Brazilian PIS/PASEP (Programa de Integração Social) numbers.
  */
 export class PISValidation extends AbstractValidatableDocument {
+    protected documentName(): string {
+        return 'pis';
+    }
+
     protected doValidate(): boolean {
         // Strip all non-digit characters to get a clean numeric string
-        const digits = this._raw.replace(/\D+/g, '');
+        const digits = this.sanitize(this._raw);
 
         // PIS must have exactly 11 digits
         if (digits.length !== 11) {

@@ -689,7 +689,7 @@ describe(IEValidation.name, () => {
 
         it('validateOrFail() throws ValidationException when invalid', () => {
             expect(() => new IEValidation('209644418', StateEnum.GO).validateOrFail()).toThrow(ValidationException);
-            expect(() => new IEValidation('209644418', StateEnum.GO).validateOrFail()).toThrow('input invalid');
+            expect(() => new IEValidation('209644418', StateEnum.GO).validateOrFail()).toThrow('ie: input invalid');
         });
 
         it('validateOrFail() respects whitelist and blacklist', () => {

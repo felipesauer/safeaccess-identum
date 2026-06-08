@@ -38,13 +38,13 @@ describe(CNHValidation::class, function () {
         $doc = (new CNHValidation($raw))->blacklist([$raw]);
 
         expect($doc->validate())->toBeFalse();
-        expect(fn () => $doc->validateOrFail())->toThrow(ValidationException::class, 'input invalid');
+        expect(fn () => $doc->validateOrFail())->toThrow(ValidationException::class, 'cnh: input invalid');
     });
 
     it('validateOrFail returns true for valid and throws for invalid', function () {
         expect((new CNHValidation('12345678900'))->validateOrFail())->toBeTrue();
         expect(fn () => (new CNHValidation('92079525000'))->validateOrFail())
-            ->toThrow(ValidationException::class, 'input invalid');
+            ->toThrow(ValidationException::class, 'cnh: input invalid');
     });
 
     it('hits the dv2 adjustment branch (dv1=10→0 and dv2-2<0 → +9)', function () {

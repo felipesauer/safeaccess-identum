@@ -22,13 +22,24 @@ final class CNPJValidation extends AbstractValidatableDocument
      * Character value mapping: ord(ch) - 48 → yields 0..9 for digits, 17..42 for A..Z.
      * Both variants use Mod11 with weights w1=[5,4,3,2,9,8,7,6,5,4,3,2] and w2=[6,5,4,3,2,9,8,7,6,5,4,3,2].
      */
+    protected function documentName(): string
+    {
+        return 'cnpj';
+    }
+
+    /**
+     * CNPJ keeps letters (alphanumeric format), so it cannot strip to digits only.
+     * Uppercases and removes only formatting separators; other characters are
+     * preserved so they are caught as invalid during validation.
+     */
+    protected function sanitize(string $value): string
+    {
+        return preg_replace('/[\s.\-\/]/', '', strtoupper($value)) ?? '';
+    }
+
     protected function doValidate(): bool
     {
-        $raw = strtoupper($this->raw());
-
-        // Strip common formatting separators (dot, dash, slash) and whitespace.
-        // Preserve any other characters for validation (e.g., '@', '#') to catch them as invalid chars.
-        $txt = preg_replace('/[\s.\-\/]/', '', $raw) ?? '';
+        $txt = $this->sanitize($this->raw());
 
         // Guard: CNPJ must be exactly 14 characters long
         if (strlen($txt) !== 14) {

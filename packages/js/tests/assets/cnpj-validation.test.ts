@@ -70,7 +70,7 @@ describe(CNPJValidation.name, () => {
         expect(() => new CNPJValidation('09387424300012').validateOrFail())
             .toThrow(ValidationException);
         expect(() => new CNPJValidation('09387424300012').validateOrFail())
-            .toThrow('input invalid');
+            .toThrow('cnpj: input invalid');
     });
 
     it('validateOrFail() respects whitelist and blacklist', () => {

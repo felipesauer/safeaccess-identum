@@ -11,9 +11,10 @@ export default defineConfig({
             reporter: ['json', 'clover'],
             thresholds: {
                 lines: 100,
+                // One legacy branch in ie/rules/ro-rule.ts is uncovered; raise to 100 once it is.
                 branches: 95,
                 functions: 100,
-                statements: 99,
+                statements: 100,
             },
         },
     },
