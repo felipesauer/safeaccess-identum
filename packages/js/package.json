@@ -1,6 +1,6 @@
 {
     "name": "@safeaccess/identum",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "private": false,
     "description": "Brazilian document validation (CPF, CNPJ, CNH, IE, PIS, CNS, RENAVAM, CEP, Plate, Voter Title) — JavaScript/TypeScript",
     "license": "MIT",
