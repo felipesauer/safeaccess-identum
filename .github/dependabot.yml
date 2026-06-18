@@ -1,28 +1,6 @@
 version: 2
 
 updates:
-    # JavaScript / TypeScript dependencies
-    - package-ecosystem: "npm"
-      directory: "/packages/js"
-      schedule:
-          interval: "weekly"
-          day: "monday"
-      labels:
-          - "dependencies"
-          - "js"
-      commit-message:
-          prefix: "chore(js)"
-      reviewers:
-          - "felipesauer"
-      groups:
-          dev-dependencies:
-              dependency-type: "development"
-              update-types:
-                  - "minor"
-                  - "patch"
-          production-dependencies:
-              dependency-type: "production"
-
     # PHP / Composer dependencies
     - package-ecosystem: "composer"
       directory: "/packages/php"
@@ -45,7 +23,7 @@ updates:
           production-dependencies:
               dependency-type: "production"
 
-    # Root tooling (husky, commitlint, lint-staged, prettier)
+    # All npm deps (root tooling + packages/js workspace — single shared lockfile)
     - package-ecosystem: "npm"
       directory: "/"
       schedule:
@@ -59,7 +37,7 @@ updates:
       reviewers:
           - "felipesauer"
       groups:
-          root-tooling:
+          npm:
               dependency-type: "development"
               update-types:
                   - "minor"
