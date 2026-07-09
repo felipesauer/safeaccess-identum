@@ -5,13 +5,71 @@
     "description": "Brazilian document validation (CPF, CNPJ, CNH, IE, PIS, CNS, RENAVAM, CEP, Plate, Voter Title) — JavaScript/TypeScript",
     "license": "MIT",
     "type": "module",
+    "sideEffects": false,
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {
         ".": {
-            "import": "./dist/index.js",
-            "types": "./dist/index.d.ts"
-        }
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./cpf": {
+            "types": "./dist/assets/cpf/cpf-validation.d.ts",
+            "import": "./dist/assets/cpf/cpf-validation.js"
+        },
+        "./cnpj": {
+            "types": "./dist/assets/cnpj/cnpj-validation.d.ts",
+            "import": "./dist/assets/cnpj/cnpj-validation.js"
+        },
+        "./cnh": {
+            "types": "./dist/assets/cnh/cnh-validation.d.ts",
+            "import": "./dist/assets/cnh/cnh-validation.js"
+        },
+        "./cep": {
+            "types": "./dist/assets/cep/cep-validation.d.ts",
+            "import": "./dist/assets/cep/cep-validation.js"
+        },
+        "./cns": {
+            "types": "./dist/assets/cns/cns-validation.d.ts",
+            "import": "./dist/assets/cns/cns-validation.js"
+        },
+        "./pis": {
+            "types": "./dist/assets/pis/pis-validation.d.ts",
+            "import": "./dist/assets/pis/pis-validation.js"
+        },
+        "./ie": {
+            "types": "./dist/assets/ie/ie-validation.d.ts",
+            "import": "./dist/assets/ie/ie-validation.js"
+        },
+        "./renavam": {
+            "types": "./dist/assets/renavam/renavam-validation.d.ts",
+            "import": "./dist/assets/renavam/renavam-validation.js"
+        },
+        "./placa": {
+            "types": "./dist/assets/plate/plate-mercosul-validation.d.ts",
+            "import": "./dist/assets/plate/plate-mercosul-validation.js"
+        },
+        "./titulo-eleitor": {
+            "types": "./dist/assets/voter/voter-title-validation.d.ts",
+            "import": "./dist/assets/voter/voter-title-validation.js"
+        },
+        "./cartao": {
+            "types": "./dist/assets/cartao/cartao-validation.d.ts",
+            "import": "./dist/assets/cartao/cartao-validation.js"
+        },
+        "./certidao": {
+            "types": "./dist/assets/certidao/certidao-validation.d.ts",
+            "import": "./dist/assets/certidao/certidao-validation.js"
+        },
+        "./pix": {
+            "types": "./dist/assets/pix/pix-validation.d.ts",
+            "import": "./dist/assets/pix/pix-validation.js"
+        },
+        "./state-enum": {
+            "types": "./dist/assets/ie/state-enum.d.ts",
+            "import": "./dist/assets/ie/state-enum.js"
+        },
+        "./package.json": "./package.json"
     },
     "keywords": [
         "safeaccess",
