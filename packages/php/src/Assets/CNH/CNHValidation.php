@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SafeAccess\Identum\Assets\CNH;
 
 use SafeAccess\Identum\Contracts\AbstractValidatableDocument;
+use SafeAccess\Identum\Contracts\ReasonCode;
 
 /**
  * Validates Brazilian CNH (Carteira Nacional de Habilitação) numbers.
@@ -18,19 +19,19 @@ final class CNHValidation extends AbstractValidatableDocument
         return 'cnh';
     }
 
-    protected function doValidate(): bool
+    protected function doValidate(): ?ReasonCode
     {
         // Strip all non-digit characters to get a clean numeric string
         $digits = $this->sanitize($this->raw());
 
         // CNH must have exactly 11 digits
         if (strlen($digits) !== 11) {
-            return false;
+            return ReasonCode::WrongLength;
         }
 
         // Guard: DETRAN (Brazilian traffic authority) does not issue sequential same-digit blocks
         if (preg_match('/^(\d)\1{10}$/', $digits) === 1) {
-            return false;
+            return ReasonCode::KnownInvalid;
         }
 
         $base = substr($digits, 0, 9);
@@ -75,6 +76,6 @@ final class CNHValidation extends AbstractValidatableDocument
         }
 
         // Final verification: check if computed DV1/DV2 match the informed check digits
-        return $dvInformed1 === $dv1 && $dvInformed2 === $dv2;
+        return $dvInformed1 === $dv1 && $dvInformed2 === $dv2 ? null : ReasonCode::BadCheckDigit;
     }
 }

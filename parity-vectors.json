@@ -1,53 +1,58 @@
 {
-    "$comment": "Single source of truth for PHP<->TypeScript parity tests. Both packages load and iterate this file (packages/php/tests/Unit/ParityTest.php and packages/js/tests/parity.test.ts). Every case must return `valid` for the given `input` in BOTH languages. Do not duplicate cases inline in the test files — add them here.",
+    "$comment": "Single source of truth for PHP<->TypeScript parity tests. Both packages load and iterate this file (packages/php/tests/Unit/ParityTest.php and packages/js/tests/parity.test.ts). Every case must return the same `valid` and, when `reason` is present, the same reason code for the given `input` in BOTH languages. Do not duplicate cases inline in the test files — add them here.",
     "cpf": [
         { "input": "529.982.247-25", "valid": true },
         { "input": "52998224725", "valid": true },
-        { "input": "111.111.111-11", "valid": false },
-        { "input": "000.000.000-00", "valid": false }
+        { "input": "111.111.111-11", "valid": false, "reason": "known_invalid" },
+        { "input": "000.000.000-00", "valid": false, "reason": "known_invalid" },
+        { "input": "529.982.247-24", "valid": false, "reason": "bad_check_digit" },
+        { "input": "5299822472", "valid": false, "reason": "wrong_length" }
     ],
     "cnpj": [
         { "input": "84.773.274/0001-03", "valid": true },
         { "input": "84773274000103", "valid": true },
         { "input": "A0000000000032", "valid": true },
-        { "input": "11.111.111/1111-11", "valid": false }
+        { "input": "11.111.111/1111-11", "valid": false, "reason": "known_invalid" },
+        { "input": "84.773.274/0001-04", "valid": false, "reason": "bad_check_digit" },
+        { "input": "847732740001", "valid": false, "reason": "wrong_length" }
     ],
     "cnh": [
         { "input": "22522791508", "valid": true },
-        { "input": "00000000000", "valid": false }
+        { "input": "00000000000", "valid": false, "reason": "known_invalid" },
+        { "input": "22522791509", "valid": false, "reason": "bad_check_digit" }
     ],
     "cep": [
         { "input": "78000-000", "valid": true },
         { "input": "78000000", "valid": true },
-        { "input": "1234567", "valid": false }
+        { "input": "1234567", "valid": false, "reason": "wrong_length" }
     ],
     "cns": [
         { "input": "100000000060018", "valid": true },
         { "input": "700000000000005", "valid": true },
-        { "input": "000000000000000", "valid": false }
+        { "input": "000000000000000", "valid": false, "reason": "invalid_format" }
     ],
     "pis": [
         { "input": "329.9506.158-9", "valid": true },
         { "input": "32995061589", "valid": true },
-        { "input": "00000000000", "valid": false }
+        { "input": "00000000000", "valid": false, "reason": "known_invalid" }
     ],
     "ie": [
         { "input": "343173196450", "state": "SP", "valid": true },
         { "input": "343.173.196.450", "state": "SP", "valid": true },
         { "input": "153189458", "state": "BA", "valid": true },
         { "input": "7908930932562", "state": "MG", "valid": true },
-        { "input": "000000000000", "state": "SP", "valid": false }
+        { "input": "000000000000", "state": "SP", "valid": false, "reason": "bad_check_digit" }
     ],
     "renavam": [
         { "input": "60390908553", "valid": true },
-        { "input": "00000000000", "valid": false }
+        { "input": "00000000000", "valid": false, "reason": "known_invalid" }
     ],
     "placa": [
         { "input": "ABC1D23", "valid": true },
-        { "input": "ABC1234", "valid": false }
+        { "input": "ABC1234", "valid": false, "reason": "invalid_format" }
     ],
     "tituloEleitor": [
         { "input": "123456781295", "valid": true },
-        { "input": "000000000000", "valid": false }
+        { "input": "000000000000", "valid": false, "reason": "known_invalid" }
     ]
 }

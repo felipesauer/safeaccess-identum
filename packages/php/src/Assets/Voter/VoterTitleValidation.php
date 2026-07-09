@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SafeAccess\Identum\Assets\Voter;
 
 use SafeAccess\Identum\Contracts\AbstractValidatableDocument;
+use SafeAccess\Identum\Contracts\ReasonCode;
 
 /**
  * Validates Brazilian Voter Title (Título de Eleitor) numbers.
@@ -18,19 +19,19 @@ final class VoterTitleValidation extends AbstractValidatableDocument
         return 'voter-title';
     }
 
-    protected function doValidate(): bool
+    protected function doValidate(): ?ReasonCode
     {
         // Strip all non-digit characters to get a clean numeric string
         $digits = $this->sanitize($this->raw());
 
         // Voter Title must have exactly 12 digits
         if (strlen($digits) !== 12) {
-            return false;
+            return ReasonCode::WrongLength;
         }
 
         // Guard: TSE (Supreme Electoral Court) does not use all-same-digit sequences
         if (preg_match('/^(\d)\1{11}$/', $digits) === 1) {
-            return false;
+            return ReasonCode::KnownInvalid;
         }
 
         $serial = substr($digits, 0, 8);
@@ -63,6 +64,6 @@ final class VoterTitleValidation extends AbstractValidatableDocument
         }
 
         // Final verification: check if computed DV1/DV2 match the informed check digits
-        return $dvIn1 === $dv1 && $dvIn2 === $dv2;
+        return $dvIn1 === $dv1 && $dvIn2 === $dv2 ? null : ReasonCode::BadCheckDigit;
     }
 }

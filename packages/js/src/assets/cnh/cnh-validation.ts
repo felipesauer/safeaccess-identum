@@ -1,4 +1,5 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
+import { ReasonCode } from '../../contracts/reason-code.js';
 
 /**
  * Validates Brazilian CNH (Carteira Nacional de Habilitação) numbers.
@@ -15,18 +16,18 @@ export class CNHValidation extends AbstractValidatableDocument {
         return 'cnh';
     }
 
-    protected doValidate(): boolean {
+    protected doValidate(): ReasonCode | null {
         // Strip all non-digit characters to get a clean numeric string
         const digits = this.sanitize(this._raw);
 
         // CNH must have exactly 11 digits
         if (digits.length !== 11) {
-            return false;
+            return ReasonCode.WrongLength;
         }
 
         // Guard: DETRAN (Brazilian traffic authority) does not issue sequential same-digit blocks
         if (/^(\d)\1{10}$/.test(digits)) {
-            return false;
+            return ReasonCode.KnownInvalid;
         }
 
         const base = digits.slice(0, 9);
@@ -71,6 +72,6 @@ export class CNHValidation extends AbstractValidatableDocument {
         }
 
         // Final verification: check if computed DV1/DV2 match the informed check digits
-        return dvInformed1 === dv1 && dvInformed2 === dv2;
+        return dvInformed1 === dv1 && dvInformed2 === dv2 ? null : ReasonCode.BadCheckDigit;
     }
 }

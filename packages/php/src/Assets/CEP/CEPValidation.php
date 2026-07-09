@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SafeAccess\Identum\Assets\CEP;
 
 use SafeAccess\Identum\Contracts\AbstractValidatableDocument;
+use SafeAccess\Identum\Contracts\ReasonCode;
 
 /**
  * Validates Brazilian CEP (Código de Endereçamento Postal) numbers.
@@ -18,7 +19,7 @@ final class CEPValidation extends AbstractValidatableDocument
         return 'cep';
     }
 
-    protected function doValidate(): bool
+    protected function doValidate(): ?ReasonCode
     {
         // Strip all non-digit characters to get a clean numeric string
         $digits = $this->sanitize($this->raw());
@@ -27,6 +28,6 @@ final class CEPValidation extends AbstractValidatableDocument
         // NOTE: This validator performs format validation only — range and locality rules
         // are the responsibility of the consuming application, as new ranges may be assigned
         // by the Brazilian postal service (ECT) after this library's release.
-        return strlen($digits) === 8;
+        return strlen($digits) === 8 ? null : ReasonCode::WrongLength;
     }
 }

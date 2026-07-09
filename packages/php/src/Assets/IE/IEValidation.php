@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace SafeAccess\Identum\Assets\IE;
 
 use SafeAccess\Identum\Contracts\AbstractValidatableDocumentRules;
+use SafeAccess\Identum\Contracts\DocumentMeta;
+use SafeAccess\Identum\Contracts\ReasonCode;
 use SafeAccess\Identum\Exceptions\InvalidStateRuleException;
 
 /**
@@ -77,7 +79,7 @@ final class IEValidation extends AbstractValidatableDocumentRules
         $state = $this->state instanceof StateEnum ? $this->state->value : $this->state;
 
         if (!array_key_exists($state, $this->alias)) {
-            throw new InvalidStateRuleException('invalid state rule');
+            throw new InvalidStateRuleException('ie', $this->sanitize($this->raw));
         }
 
         $this->rule = $this->alias[$state];
@@ -93,8 +95,18 @@ final class IEValidation extends AbstractValidatableDocumentRules
     /**
      * {@inheritDoc}
      */
-    protected function doValidate(): bool
+    protected function doValidate(): ?ReasonCode
     {
-        return $this->rule::make()->execute($this->raw);
+        $rule = new ($this->rule)();
+
+        return $rule->execute($this->raw) ? null : ReasonCode::BadCheckDigit;
+    }
+
+    /** The UF is known upfront (it is the dispatch key), so echo it back as metadata. */
+    protected function extractMeta(string $normalized): DocumentMeta
+    {
+        $state = $this->state instanceof StateEnum ? $this->state : StateEnum::from($this->state);
+
+        return new DocumentMeta(uf: $state->name);
     }
 }

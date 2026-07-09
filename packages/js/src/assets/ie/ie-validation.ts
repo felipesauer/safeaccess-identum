@@ -1,4 +1,6 @@
 import { AbstractValidatableDocumentRules } from '../../contracts/abstract-validatable-document-rules.js';
+import { ReasonCode } from '../../contracts/reason-code.js';
+import type { DocumentMeta } from '../../contracts/validation-result.js';
 import { InvalidStateRuleException } from '../../exceptions/invalid-state-rule-exception.js';
 import { StateEnum } from './state-enum.js';
 import type { StateCode } from './state-enum.js';
@@ -73,7 +75,6 @@ const ruleMap: Record<number, RuleFactory> = {
  * @throws {@link InvalidStateRuleException} When the provided state code is not supported.
  */
 export class IEValidation extends AbstractValidatableDocumentRules {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     private rule!: AbstractStateRule;
     private readonly state: StateCode | number;
 
@@ -86,7 +87,7 @@ export class IEValidation extends AbstractValidatableDocumentRules {
     protected doRule(): this {
         const factory = ruleMap[this.state];
         if (!factory) {
-            throw new InvalidStateRuleException('invalid state rule');
+            throw new InvalidStateRuleException('ie', this.sanitize(this._raw));
         }
 
         this.rule = factory();
@@ -98,7 +99,17 @@ export class IEValidation extends AbstractValidatableDocumentRules {
         return 'ie';
     }
 
-    protected doValidate(): boolean {
-        return this.rule.execute(this._raw);
+    protected doValidate(): ReasonCode | null {
+        return this.rule.execute(this._raw) ? null : ReasonCode.BadCheckDigit;
+    }
+
+    /** The UF is known upfront (it is the dispatch key), so echo it back as metadata. */
+    protected extractMeta(): DocumentMeta {
+        // The state was validated in the constructor (doRule), so a name always exists.
+        const uf = Object.keys(StateEnum).find(
+            (name) => StateEnum[name as keyof typeof StateEnum] === this.state,
+        );
+
+        return uf === undefined ? {} : { uf };
     }
 }

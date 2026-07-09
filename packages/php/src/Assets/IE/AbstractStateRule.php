@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace SafeAccess\Identum\Assets\IE;
 
-use SafeAccess\Identum\Internal\Makeable;
-
 /**
  * Base class for per-state IE validation rules.
  *
@@ -19,7 +17,6 @@ use SafeAccess\Identum\Internal\Makeable;
  */
 abstract class AbstractStateRule
 {
-    use Makeable;
     use DocumentMath;
 
     /**

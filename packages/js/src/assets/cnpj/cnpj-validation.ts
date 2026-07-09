@@ -1,4 +1,6 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
+import { ReasonCode } from '../../contracts/reason-code.js';
+import type { DocumentMeta } from '../../contracts/validation-result.js';
 
 /**
  * Validates Brazilian CNPJ (Cadastro Nacional da Pessoa Jurídica) numbers.
@@ -19,36 +21,32 @@ export class CNPJValidation extends AbstractValidatableDocument {
         return value.toUpperCase().replace(/[\s.\-/]/g, '');
     }
 
-    protected doValidate(): boolean {
+    protected doValidate(): ReasonCode | null {
         const txt = this.sanitize(this._raw);
 
         // Guard: CNPJ must be exactly 14 characters long
         if (txt.length !== 14) {
-            return false;
+            return ReasonCode.WrongLength;
         }
 
-        // Guard: check digits (positions 12–13) must always be numeric digits
-        if (!/^\d{2}$/.test(txt.slice(12))) {
-            return false;
+        // Guard: only [A-Z0-9] are allowed; check digits (positions 12–13) must be numeric
+        if (!/^[A-Z0-9]{12}[0-9]{2}$/.test(txt)) {
+            return ReasonCode.InvalidFormat;
         }
 
         // Guard: if purely numeric, reject the all-same-digit pattern
         if (/^\d{14}$/.test(txt) && /^(\d)\1{13}$/.test(txt)) {
-            return false;
+            return ReasonCode.KnownInvalid;
         }
 
         const body12 = txt.slice(0, 12);
         const dvIn1 = Number(txt[12]);
         const dvIn2 = Number(txt[13]);
 
-        // Character → integer value mapper: charCodeAt(0) - 48
+        // Character → integer value mapper: charCodeAt(0) - 48.
         // Digits '0'–'9' map to 0–9; letters 'A'–'Z' map to 17–42.
-        const val = (ch: string): number => {
-            const o = ch.charCodeAt(0);
-            if (o >= 48 && o <= 57) return o - 48; // '0'..'9' → 0..9
-            if (o >= 65 && o <= 90) return o - 48; // 'A'..'Z' → 17..42
-            return -1; // Invalid character
-        };
+        // The InvalidFormat guard above already ensured every body char is [A-Z0-9].
+        const val = (ch: string): number => ch.charCodeAt(0) - 48;
 
         // Weights for DV1 and DV2 calculations
         const w1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
@@ -58,9 +56,7 @@ export class CNPJValidation extends AbstractValidatableDocument {
         // Sum of (character_value × weight) for the first 12 positions, then modulo 11.
         let sum = 0;
         for (let i = 0; i < 12; i++) {
-            const v = val(body12[i]);
-            if (v < 0) return false; // Invalid character found
-            sum += v * w1[i];
+            sum += val(body12[i]) * w1[i];
         }
         const rest1 = sum % 11;
         const dv1 = rest1 < 2 ? 0 : 11 - rest1;
@@ -76,6 +72,17 @@ export class CNPJValidation extends AbstractValidatableDocument {
         const dv2 = rest2 < 2 ? 0 : 11 - rest2;
 
         // Final verification: check if computed DV1/DV2 match the input check digits
-        return dvIn1 === dv1 && dvIn2 === dv2;
+        return dvIn1 === dv1 && dvIn2 === dv2 ? null : ReasonCode.BadCheckDigit;
+    }
+
+    /**
+     * CNPJ metadata: whether it is a headquarters (branch marker '0001' before the
+     * check digits) and whether it uses the alphanumeric format (any letter present).
+     */
+    protected extractMeta(normalized: string): DocumentMeta {
+        return {
+            isMatriz: normalized.slice(8, 12) === '0001',
+            isAlphanumeric: /[A-Z]/.test(normalized),
+        };
     }
 }

@@ -1,4 +1,5 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
+import { ReasonCode } from '../../contracts/reason-code.js';
 
 /**
  * Validates Brazilian RENAVAM (Registro Nacional de Veículos Automotores) numbers.
@@ -8,18 +9,18 @@ export class RenavamValidation extends AbstractValidatableDocument {
         return 'renavam';
     }
 
-    protected doValidate(): boolean {
+    protected doValidate(): ReasonCode | null {
         // Strip all non-digit characters to get a clean numeric string
         const digits = this.sanitize(this._raw);
 
         // RENAVAM must have exactly 11 digits
         if (digits.length !== 11) {
-            return false;
+            return ReasonCode.WrongLength;
         }
 
         // Guard: DENATRAN (Brazilian national vehicle registry) does not assign all-same-digit sequences
         if (/^(\d)\1{10}$/.test(digits)) {
-            return false;
+            return ReasonCode.KnownInvalid;
         }
 
         const base = digits.slice(0, 10);
@@ -43,6 +44,6 @@ export class RenavamValidation extends AbstractValidatableDocument {
         }
 
         // Final verification: check if computed DV matches the check digit at position 10
-        return dv === dvIn;
+        return dv === dvIn ? null : ReasonCode.BadCheckDigit;
     }
 }

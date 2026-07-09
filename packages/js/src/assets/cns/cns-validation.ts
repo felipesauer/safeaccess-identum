@@ -1,4 +1,6 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
+import { ReasonCode } from '../../contracts/reason-code.js';
+import type { DocumentMeta } from '../../contracts/validation-result.js';
 
 /**
  * Validates Brazilian CNS (Cartão Nacional de Saúde) numbers.
@@ -8,13 +10,13 @@ export class CNSValidation extends AbstractValidatableDocument {
         return 'cns';
     }
 
-    protected doValidate(): boolean {
+    protected doValidate(): ReasonCode | null {
         // Strip all non-digit characters to get a clean numeric string
         const digits = this.sanitize(this._raw);
 
         // CNS (National Health Card) must have exactly 15 digits
         if (digits.length !== 15) {
-            return false;
+            return ReasonCode.WrongLength;
         }
 
         const first = Number(digits[0]);
@@ -50,7 +52,7 @@ export class CNSValidation extends AbstractValidatableDocument {
                 resultado = pis + '000' + String(dv);
             }
 
-            return digits === resultado;
+            return digits === resultado ? null : ReasonCode.BadCheckDigit;
         }
 
         // ===== CNS Type 7, 8, 9: Provisional (Not Tied to PIS) =====
@@ -62,9 +64,18 @@ export class CNSValidation extends AbstractValidatableDocument {
             for (let i = 0, w = 15; i < 15; i++, w--) {
                 sum += Number(digits[i]) * w;
             }
-            return sum % 11 === 0;
+            return sum % 11 === 0 ? null : ReasonCode.BadCheckDigit;
         }
 
-        return false;
+        // Leading digit is not a recognized CNS range (1,2,7,8,9).
+        return ReasonCode.InvalidFormat;
+    }
+
+    /** CNS subtype from the leading digit: 1/2 definitive, 7/8/9 provisional. */
+    protected extractMeta(normalized: string): DocumentMeta {
+        const first = Number(normalized[0]);
+        const type = first === 1 || first === 2 ? 'definitive' : 'provisional';
+
+        return { type };
     }
 }

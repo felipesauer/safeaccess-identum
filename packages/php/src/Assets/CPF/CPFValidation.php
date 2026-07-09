@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace SafeAccess\Identum\Assets\CPF;
 
 use SafeAccess\Identum\Contracts\AbstractValidatableDocument;
+use SafeAccess\Identum\Contracts\DocumentMeta;
+use SafeAccess\Identum\Contracts\ReasonCode;
 
 /**
  * Validates Brazilian CPF (Cadastro de Pessoas Físicas) numbers.
@@ -15,6 +17,25 @@ use SafeAccess\Identum\Contracts\AbstractValidatableDocument;
  */
 final class CPFValidation extends AbstractValidatableDocument
 {
+    /**
+     * Fiscal region by the 9th digit (index 8). Each digit maps to a group of
+     * states, not a single UF, so the value is the region's state list.
+     *
+     * @var array<int, string>
+     */
+    private const FISCAL_REGIONS = [
+        0 => 'RS',
+        1 => 'DF-GO-MS-MT-TO',
+        2 => 'AC-AM-AP-PA-RO-RR',
+        3 => 'CE-MA-PI',
+        4 => 'AL-PB-PE-RN',
+        5 => 'BA-SE',
+        6 => 'MG',
+        7 => 'ES-RJ',
+        8 => 'SP',
+        9 => 'PR-SC',
+    ];
+
     protected function documentName(): string
     {
         return 'cpf';
@@ -25,23 +46,21 @@ final class CPFValidation extends AbstractValidatableDocument
      * - Must have 11 digits
      * - Must not be a repeated sequence (e.g., 000..., 111..., ...)
      * - Must match both check digits (Mod11)
-     *
-     * @return bool
      */
-    protected function doValidate(): bool
+    protected function doValidate(): ?ReasonCode
     {
         // Strip all non-digit characters to get a clean numeric string
         $digits = $this->sanitize($this->raw());
 
         // CPF must have exactly 11 digits
         if (strlen($digits) !== 11) {
-            return false;
+            return ReasonCode::WrongLength;
         }
 
         // Guard: Receita Federal (Brazilian tax authority) reserves all 11-same-digit sequences
         // (e.g., 000...000, 111...111) as invalid forever — no valid CPF exists with all same digits.
         if (preg_match('/^(\d)\1{10}$/', $digits) === 1) {
-            return false;
+            return ReasonCode::KnownInvalid;
         }
 
         // ===== First Verification Digit (DV1) =====
@@ -67,9 +86,17 @@ final class CPFValidation extends AbstractValidatableDocument
 
         // Final verification: check if the computed DV1/DV2 match the digits at positions 9 and 10
         if ($digits[9] !== (string) $dv1 || $digits[10] !== (string) $dv2) {
-            return false;
+            return ReasonCode::BadCheckDigit;
         }
 
-        return true;
+        return null;
+    }
+
+    /** Fiscal region (group of states) inferred from the 9th digit. */
+    protected function extractMeta(string $normalized): DocumentMeta
+    {
+        $region = self::FISCAL_REGIONS[(int) $normalized[8]] ?? null;
+
+        return new DocumentMeta(uf: $region);
     }
 }

@@ -1,4 +1,23 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
+import { ReasonCode } from '../../contracts/reason-code.js';
+import type { DocumentMeta } from '../../contracts/validation-result.js';
+
+/**
+ * Fiscal region by the 9th digit (index 8). Each digit maps to a group of
+ * states, not a single UF, so the value is the region's state list.
+ */
+const FISCAL_REGIONS: Record<number, string> = {
+    0: 'RS',
+    1: 'DF-GO-MS-MT-TO',
+    2: 'AC-AM-AP-PA-RO-RR',
+    3: 'CE-MA-PI',
+    4: 'AL-PB-PE-RN',
+    5: 'BA-SE',
+    6: 'MG',
+    7: 'ES-RJ',
+    8: 'SP',
+    9: 'PR-SC',
+};
 
 /**
  * Validates Brazilian CPF (Cadastro de Pessoas Físicas) numbers.
@@ -10,19 +29,19 @@ export class CPFValidation extends AbstractValidatableDocument {
         return 'cpf';
     }
 
-    protected doValidate(): boolean {
+    protected doValidate(): ReasonCode | null {
         // Strip all non-digit characters to get a clean numeric string
         const digits = this.sanitize(this._raw);
 
         // CPF must have exactly 11 digits
         if (digits.length !== 11) {
-            return false;
+            return ReasonCode.WrongLength;
         }
 
         // Guard: Receita Federal (Brazilian tax authority) reserves all 11-same-digit sequences
         // (e.g., 000...000, 111...111) as invalid forever — no valid CPF exists with all same digits.
         if (/^(\d)\1{10}$/.test(digits)) {
-            return false;
+            return ReasonCode.KnownInvalid;
         }
 
         // ===== First Verification Digit (DV1) =====
@@ -47,6 +66,15 @@ export class CPFValidation extends AbstractValidatableDocument {
         const dv2 = rest2 < 2 ? 0 : 11 - rest2;
 
         // Final verification: check if the computed DV1/DV2 match the digits at positions 9 and 10
-        return digits[9] === String(dv1) && digits[10] === String(dv2);
+        if (digits[9] !== String(dv1) || digits[10] !== String(dv2)) {
+            return ReasonCode.BadCheckDigit;
+        }
+
+        return null;
+    }
+
+    /** Fiscal region (group of states) inferred from the 9th digit. */
+    protected extractMeta(normalized: string): DocumentMeta {
+        return { uf: FISCAL_REGIONS[Number(normalized[8])] };
     }
 }

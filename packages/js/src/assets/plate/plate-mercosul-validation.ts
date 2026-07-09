@@ -1,4 +1,6 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
+import { ReasonCode } from '../../contracts/reason-code.js';
+import type { DocumentMeta } from '../../contracts/validation-result.js';
 
 /**
  * Validates Mercosul vehicle plate numbers.
@@ -16,16 +18,25 @@ export class PlateMercosulValidation extends AbstractValidatableDocument {
         return value.toUpperCase().trim().replace(/[^A-Z0-9]/g, '');
     }
 
-    protected doValidate(): boolean {
+    protected doValidate(): ReasonCode | null {
         const value = this.sanitize(this._raw);
 
         // Mercosul plate format: LLLNLNN (3 letters + 1 digit + 1 letter + 2 digits = 7 total characters)
         // Example: BRA1A23
         if (value.length !== 7) {
-            return false;
+            return ReasonCode.WrongLength;
         }
 
         // Validate pattern: exactly 3 letters, then digit, then letter, then 2 digits
-        return /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/.test(value);
+        if (!/^[A-Z]{3}[0-9][A-Z][0-9]{2}$/.test(value)) {
+            return ReasonCode.InvalidFormat;
+        }
+
+        return null;
+    }
+
+    /** Layout of a valid plate. This validator only accepts the Mercosul layout. */
+    protected extractMeta(): DocumentMeta {
+        return { pattern: 'mercosul' };
     }
 }

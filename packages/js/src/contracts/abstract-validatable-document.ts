@@ -1,24 +1,32 @@
 import { ValidationException } from '../exceptions/validation-exception.js';
+import type { ReasonCode } from './reason-code.js';
+import { ReasonCode as Reason } from './reason-code.js';
+import type { DocumentMeta, ValidationResult } from './validation-result.js';
 
 /**
  * Contract for document validators.
  *
- * Defines the public API that all document validators must implement,
- * including validation, failure handling, and input access.
+ * Defines the public API that all document validators must implement:
+ * rich validation, a boolean shortcut, throwing validation, format-agnostic
+ * allow/deny lists, and access to the raw input.
+ *
+ * @see {@link AbstractValidatableDocument} Default implementation base.
  */
 export interface ValidatableDocument {
-    /** Validates the current value. */
-    validate(): boolean;
+    /** Validates the current value and returns a rich result. */
+    validate(): ValidationResult;
+    /** Boolean shortcut for {@link validate} — true when valid. */
+    isValid(): boolean;
     /**
-     * Validates or throws a ValidationException with a concise reason.
+     * Validates or throws a {@link ValidationException} carrying the reason.
      *
      * @throws {@link ValidationException} If validation fails.
      */
-    validateOrFail(): true;
-    /** Sets values that should be considered invalid by default. */
-    blacklist(values: string[]): this;
-    /** Sets values that should be considered valid by default. */
-    whitelist(values: string[]): this;
+    validateOrFail(): void;
+    /** Force-rejects the given values regardless of checksum (format-agnostic). */
+    denyList(values: string[]): this;
+    /** Force-accepts the given values regardless of checksum (format-agnostic). */
+    allowList(values: string[]): this;
     /** Returns the raw (as provided) input value. */
     raw(): string;
 }
@@ -26,9 +34,10 @@ export interface ValidatableDocument {
 /**
  * Base implementation for document validators.
  *
- * Provides the template method pattern: subclasses implement {@link doValidate}
- * with format-specific validation logic, while this class handles blacklist/whitelist
- * filtering and the validate/validateOrFail lifecycle.
+ * Subclasses implement {@link doValidate} with document-specific logic,
+ * returning `null` when valid or the {@link ReasonCode} that applies otherwise.
+ * This class owns the allow/deny-list checks, metadata assembly and the
+ * validate / isValid / validateOrFail lifecycle.
  *
  * @internal Extend this class to create new document validators.
  *
@@ -36,8 +45,8 @@ export interface ValidatableDocument {
  */
 export abstract class AbstractValidatableDocument implements ValidatableDocument {
     protected readonly _raw: string;
-    protected _blacklist: string[] = [];
-    protected _whitelist: string[] = [];
+    protected _denyList: string[] = [];
+    protected _allowList: string[] = [];
 
     constructor(value: string) {
         this._raw = value;
@@ -47,43 +56,78 @@ export abstract class AbstractValidatableDocument implements ValidatableDocument
         return this._raw;
     }
 
+    denyList(values: string[]): this {
+        this._denyList = values;
+        return this;
+    }
+
+    allowList(values: string[]): this {
+        this._allowList = values;
+        return this;
+    }
+
+    /** @deprecated 2.0 Use {@link denyList}. Removed in 3.0. */
     blacklist(values: string[]): this {
-        this._blacklist = values;
-        return this;
+        return this.denyList(values);
     }
 
+    /** @deprecated 2.0 Use {@link allowList}. Removed in 3.0. */
     whitelist(values: string[]): this {
-        this._whitelist = values;
-        return this;
+        return this.allowList(values);
     }
 
-    validate(): boolean {
-        if (this.isWhitelisted(this._raw)) {
-            return true;
+    validate(): ValidationResult {
+        const normalized = this.sanitize(this._raw);
+
+        // Allow list wins over everything, including the checksum.
+        if (this.isAllowed(this._raw)) {
+            return { valid: true, reason: null, normalized, meta: this.extractMeta(normalized) };
         }
 
-        if (this.isBlacklisted(this._raw)) {
-            return false;
+        if (this.isDenied(this._raw)) {
+            return { valid: false, reason: Reason.Denied, normalized, meta: null };
         }
 
-        return this.doValidate();
+        const reason = this.doValidate();
+
+        if (reason !== null) {
+            return { valid: false, reason, normalized, meta: null };
+        }
+
+        return { valid: true, reason: null, normalized, meta: this.extractMeta(normalized) };
     }
 
-    validateOrFail(): true {
-        if (!this.validate()) {
-            throw new ValidationException(`${this.documentName()}: input invalid`);
-        }
-
-        return true;
+    isValid(): boolean {
+        return this.validate().valid;
     }
 
-    protected abstract doValidate(): boolean;
+    validateOrFail(): void {
+        const result = this.validate();
+
+        if (!result.valid) {
+            throw new ValidationException(this.documentName(), result.reason as ReasonCode, result.normalized);
+        }
+    }
 
     /**
-     * Short identifier of the document type, used in error messages
+     * Document-specific validation. Returns `null` when valid, otherwise the
+     * reason that applies (respecting the {@link ReasonCode} precedence order).
+     */
+    protected abstract doValidate(): ReasonCode | null;
+
+    /**
+     * Short identifier of the document type, used in exceptions
      * (e.g., "cpf", "cnpj"). Must match the PHP counterpart.
      */
     protected abstract documentName(): string;
+
+    /**
+     * Extracts metadata from a valid, normalized value. Default: no metadata.
+     * Validators that can derive information from the number override this.
+     */
+    protected extractMeta(_normalized: string): DocumentMeta | null {
+        return null;
+    }
 
     /**
      * Normalizes a value for comparison and validation.
@@ -95,14 +139,15 @@ export abstract class AbstractValidatableDocument implements ValidatableDocument
         return value.replace(/\D+/g, '');
     }
 
-    /** Whitelist/blacklist comparisons are format-agnostic: both sides are sanitized first. */
-    protected isBlacklisted(value: string): boolean {
+    /** Deny-list comparison is format-agnostic: both sides are sanitized first. */
+    protected isDenied(value: string): boolean {
         const target = this.sanitize(value);
-        return this._blacklist.some((entry) => this.sanitize(entry) === target);
+        return this._denyList.some((entry) => this.sanitize(entry) === target);
     }
 
-    protected isWhitelisted(value: string): boolean {
+    /** Allow-list comparison is format-agnostic: both sides are sanitized first. */
+    protected isAllowed(value: string): boolean {
         const target = this.sanitize(value);
-        return this._whitelist.some((entry) => this.sanitize(entry) === target);
+        return this._allowList.some((entry) => this.sanitize(entry) === target);
     }
 }

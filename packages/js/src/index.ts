@@ -20,6 +20,8 @@ export type { StateCode } from './assets/ie/state-enum.js';
 // Contracts
 export { AbstractValidatableDocument } from './contracts/abstract-validatable-document.js';
 export type { ValidatableDocument } from './contracts/abstract-validatable-document.js';
+export { ReasonCode } from './contracts/reason-code.js';
+export type { ValidationResult, DocumentMeta } from './contracts/validation-result.js';
 
 // Exceptions
 export { ValidationException } from './exceptions/validation-exception.js';

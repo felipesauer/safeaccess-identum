@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SafeAccess\Identum\Assets\RENAVAM;
 
 use SafeAccess\Identum\Contracts\AbstractValidatableDocument;
+use SafeAccess\Identum\Contracts\ReasonCode;
 
 /**
  * Validates Brazilian RENAVAM (Registro Nacional de Veículos Automotores) numbers.
@@ -18,19 +19,19 @@ final class RenavamValidation extends AbstractValidatableDocument
         return 'renavam';
     }
 
-    protected function doValidate(): bool
+    protected function doValidate(): ?ReasonCode
     {
         // Strip all non-digit characters to get a clean numeric string
         $digits = $this->sanitize($this->raw());
 
         // RENAVAM must have exactly 11 digits
         if (strlen($digits) !== 11) {
-            return false;
+            return ReasonCode::WrongLength;
         }
 
         // Guard: DENATRAN (Brazilian national vehicle registry) does not assign all-same-digit sequences
         if (preg_match('/^(\d)\1{10}$/', $digits) === 1) {
-            return false;
+            return ReasonCode::KnownInvalid;
         }
 
         $base = substr($digits, 0, 10);
@@ -54,6 +55,6 @@ final class RenavamValidation extends AbstractValidatableDocument
         }
 
         // Final verification: check if computed DV matches the check digit at position 10
-        return $dv === $dvIn;
+        return $dv === $dvIn ? null : ReasonCode::BadCheckDigit;
     }
 }

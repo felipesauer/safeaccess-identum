@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace SafeAccess\Identum\Assets\CNPJ;
 
 use SafeAccess\Identum\Contracts\AbstractValidatableDocument;
+use SafeAccess\Identum\Contracts\DocumentMeta;
+use SafeAccess\Identum\Contracts\ReasonCode;
 
 /**
  * Validates Brazilian CNPJ (Cadastro Nacional da Pessoa Jurídica) numbers.
@@ -37,41 +39,33 @@ final class CNPJValidation extends AbstractValidatableDocument
         return preg_replace('/[\s.\-\/]/', '', strtoupper($value)) ?? '';
     }
 
-    protected function doValidate(): bool
+    protected function doValidate(): ?ReasonCode
     {
         $txt = $this->sanitize($this->raw());
 
         // Guard: CNPJ must be exactly 14 characters long
         if (strlen($txt) !== 14) {
-            return false;
+            return ReasonCode::WrongLength;
         }
 
-        // Guard: check digits (positions 12–13) must always be numeric digits
-        if (!ctype_digit($txt[12] . $txt[13])) {
-            return false;
+        // Guard: only [A-Z0-9] are allowed; check digits (positions 12–13) must be numeric
+        if (preg_match('/^[A-Z0-9]{12}[0-9]{2}$/', $txt) !== 1) {
+            return ReasonCode::InvalidFormat;
         }
 
         // Guard: if purely numeric, reject the all-same-digit pattern (legacy Receita Federal rule)
         if (ctype_digit($txt) && preg_match('/^(\d)\1{13}$/', $txt) === 1) {
-            return false;
+            return ReasonCode::KnownInvalid;
         }
 
         $body12 = substr($txt, 0, 12);
         $dvIn1  = (int) $txt[12];
         $dvIn2  = (int) $txt[13];
 
-        // Character → integer value mapper: ord(char) - 48
+        // Character → integer value mapper: ord(char) - 48.
         // Digits '0'–'9' map to 0–9; letters 'A'–'Z' map to 17–42 (their ASCII value − 48).
-        $val = static function (string $ch): int {
-            $o = ord($ch);
-            if ($o >= 48 && $o <= 57) { // '0'..'9' → 0..9
-                return $o - 48;
-            }
-            if ($o >= 65 && $o <= 90) { // 'A'..'Z' → 17..42
-                return $o - 48;
-            }
-            return -1; // Invalid character (not alphanumeric)
-        };
+        // The InvalidFormat guard above already ensured every body char is [A-Z0-9].
+        $val = static fn (string $ch): int => ord($ch) - 48;
 
         // Weights for DV1 and DV2 calculations
         $w1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
@@ -82,11 +76,7 @@ final class CNPJValidation extends AbstractValidatableDocument
         // If remainder < 2, DV1 = 0; otherwise DV1 = 11 − remainder.
         $sum = 0;
         for ($i = 0; $i < 12; $i++) {
-            $v = $val($body12[$i]);
-            if ($v < 0) {
-                return false; // Invalid character found → CNPJ is invalid
-            }
-            $sum += $v * $w1[$i];
+            $sum += $val($body12[$i]) * $w1[$i];
         }
         $rest = $sum % 11;
         $dv1  = ($rest < 2) ? 0 : 11 - $rest;
@@ -104,6 +94,20 @@ final class CNPJValidation extends AbstractValidatableDocument
         $dv2  = ($rest < 2) ? 0 : 11 - $rest;
 
         // Final verification: check if computed DV1/DV2 match the input check digits
-        return $dvIn1 === $dv1 && $dvIn2 === $dv2;
+        return $dvIn1 === $dv1 && $dvIn2 === $dv2 ? null : ReasonCode::BadCheckDigit;
+    }
+
+    /**
+     * CNPJ metadata: whether it is a headquarters (branch marker '0001' before the
+     * check digits) and whether it uses the alphanumeric format (any letter present).
+     */
+    protected function extractMeta(string $normalized): DocumentMeta
+    {
+        $branch = substr($normalized, 8, 4);
+
+        return new DocumentMeta(
+            isMatriz: $branch === '0001',
+            isAlphanumeric: preg_match('/[A-Z]/', $normalized) === 1,
+        );
     }
 }

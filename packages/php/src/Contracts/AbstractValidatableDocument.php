@@ -9,8 +9,10 @@ use SafeAccess\Identum\Exceptions\ValidationException;
 /**
  * Base for document validators.
  *
- * Subclasses implement {@see doValidate()} with document-specific logic;
- * this class owns the blacklist/whitelist checks and the validate/validateOrFail flow.
+ * Subclasses implement {@see doValidate()} with document-specific logic,
+ * returning `null` when valid or the {@see ReasonCode} that applies otherwise.
+ * This class owns the allow/deny-list checks, metadata assembly and the
+ * validate / isValid / validateOrFail flow.
  *
  * @internal
  *
@@ -19,14 +21,13 @@ use SafeAccess\Identum\Exceptions\ValidationException;
  */
 abstract class AbstractValidatableDocument implements ValidatableDocument
 {
-    /** @var string */
     protected string $raw;
 
     /** @var list<string> */
-    protected array $blacklist = [];
+    protected array $denyList = [];
 
     /** @var list<string> */
-    protected array $whitelist = [];
+    protected array $allowList = [];
 
     public function __construct(string $value)
     {
@@ -43,9 +44,9 @@ abstract class AbstractValidatableDocument implements ValidatableDocument
      * @param list<string> $values
      * @return static
      */
-    public function blacklist(array $values): static
+    public function denyList(array $values): static
     {
-        $this->blacklist = $values;
+        $this->denyList = $values;
         return $this;
     }
 
@@ -53,44 +54,96 @@ abstract class AbstractValidatableDocument implements ValidatableDocument
      * @param list<string> $values
      * @return static
      */
-    public function whitelist(array $values): static
+    public function allowList(array $values): static
     {
-        $this->whitelist = $values;
+        $this->allowList = $values;
         return $this;
     }
 
-    public function validate(): bool
-    {
-        if ($this->isWhitelisted($this->raw)) {
-            return true;
-        }
-
-        if ($this->isBlacklisted($this->raw)) {
-            return false;
-        }
-
-        return $this->doValidate();
-    }
-
     /**
-     * @throws ValidationException
+     * @deprecated 2.0 Use {@see denyList()}. Removed in 3.0.
+     *
+     * @param list<string> $values
+     * @return static
      */
-    public function validateOrFail(): true
+    public function blacklist(array $values): static
     {
-        if (!$this->validate()) {
-            throw new ValidationException($this->documentName() . ': input invalid');
-        }
-
-        return true;
+        return $this->denyList($values);
     }
 
-    abstract protected function doValidate(): bool;
+    /**
+     * @deprecated 2.0 Use {@see allowList()}. Removed in 3.0.
+     *
+     * @param list<string> $values
+     * @return static
+     */
+    public function whitelist(array $values): static
+    {
+        return $this->allowList($values);
+    }
+
+    public function validate(): ValidationResult
+    {
+        $normalized = $this->sanitize($this->raw);
+
+        // Allow list wins over everything, including the checksum.
+        if ($this->isAllowed($this->raw)) {
+            return ValidationResult::valid($normalized, $this->extractMeta($normalized));
+        }
+
+        if ($this->isDenied($this->raw)) {
+            return ValidationResult::invalid(ReasonCode::Denied, $normalized);
+        }
+
+        $reason = $this->doValidate();
+
+        if ($reason !== null) {
+            return ValidationResult::invalid($reason, $normalized);
+        }
+
+        return ValidationResult::valid($normalized, $this->extractMeta($normalized));
+    }
+
+    public function isValid(): bool
+    {
+        return $this->validate()->valid;
+    }
+
+    public function validateOrFail(): void
+    {
+        $result = $this->validate();
+
+        if (!$result->valid) {
+            /** @var ReasonCode $reason */
+            $reason = $result->reason;
+            throw new ValidationException($this->documentName(), $reason, $result->normalized);
+        }
+    }
 
     /**
-     * Short identifier of the document type, used in error messages
+     * Document-specific validation.
+     *
+     * @return ReasonCode|null Null when valid, otherwise the reason that applies
+     *                         (respecting the {@see ReasonCode} precedence order).
+     */
+    abstract protected function doValidate(): ?ReasonCode;
+
+    /**
+     * Short identifier of the document type, used in exceptions
      * (e.g., "cpf", "cnpj"). Must match the JS counterpart.
      */
     abstract protected function documentName(): string;
+
+    /**
+     * Extracts metadata from a valid, normalized value.
+     *
+     * Default: no metadata. Validators that can derive information from the
+     * number itself (UF, brand, key type, …) override this.
+     */
+    protected function extractMeta(string $normalized): ?DocumentMeta
+    {
+        return null;
+    }
 
     /**
      * Normalizes a value for comparison and validation.
@@ -103,14 +156,15 @@ abstract class AbstractValidatableDocument implements ValidatableDocument
         return preg_replace('/\D+/', '', $value) ?? '';
     }
 
-    /** Whitelist/blacklist comparisons are format-agnostic: both sides are sanitized first. */
-    protected function isBlacklisted(string $value): bool
+    /** Deny-list comparison is format-agnostic: both sides are sanitized first. */
+    protected function isDenied(string $value): bool
     {
-        return in_array($this->sanitize($value), array_map($this->sanitize(...), $this->blacklist), true);
+        return in_array($this->sanitize($value), array_map($this->sanitize(...), $this->denyList), true);
     }
 
-    protected function isWhitelisted(string $value): bool
+    /** Allow-list comparison is format-agnostic: both sides are sanitized first. */
+    protected function isAllowed(string $value): bool
     {
-        return in_array($this->sanitize($value), array_map($this->sanitize(...), $this->whitelist), true);
+        return in_array($this->sanitize($value), array_map($this->sanitize(...), $this->allowList), true);
     }
 }

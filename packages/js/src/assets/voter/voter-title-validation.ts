@@ -1,4 +1,5 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
+import { ReasonCode } from '../../contracts/reason-code.js';
 
 /**
  * Validates Brazilian Voter Title (Título de Eleitor) numbers.
@@ -8,18 +9,18 @@ export class VoterTitleValidation extends AbstractValidatableDocument {
         return 'voter-title';
     }
 
-    protected doValidate(): boolean {
+    protected doValidate(): ReasonCode | null {
         // Strip all non-digit characters to get a clean numeric string
         const digits = this.sanitize(this._raw);
 
         // Voter Title must have exactly 12 digits
         if (digits.length !== 12) {
-            return false;
+            return ReasonCode.WrongLength;
         }
 
         // Guard: TSE (Supreme Electoral Court) does not use all-same-digit sequences
         if (/^(\d)\1{11}$/.test(digits)) {
-            return false;
+            return ReasonCode.KnownInvalid;
         }
 
         const serial = digits.slice(0, 8);
@@ -52,6 +53,6 @@ export class VoterTitleValidation extends AbstractValidatableDocument {
         }
 
         // Final verification: check if computed DV1/DV2 match the informed check digits
-        return dvIn1 === dv1 && dvIn2 === dv2;
+        return dvIn1 === dv1 && dvIn2 === dv2 ? null : ReasonCode.BadCheckDigit;
     }
 }

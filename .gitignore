@@ -59,3 +59,5 @@ tmp/
 .github/skills/
 .github/copilot-instructions.md
 .stryker-tmp/
+# Local-only design doc (not versioned by request)
+docs/RFC-2.0.md

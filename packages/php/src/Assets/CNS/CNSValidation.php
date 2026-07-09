@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace SafeAccess\Identum\Assets\CNS;
 
 use SafeAccess\Identum\Contracts\AbstractValidatableDocument;
+use SafeAccess\Identum\Contracts\DocumentMeta;
+use SafeAccess\Identum\Contracts\ReasonCode;
 
 /**
  * Validates Brazilian CNS (Cartão Nacional de Saúde) numbers.
@@ -18,14 +20,14 @@ final class CNSValidation extends AbstractValidatableDocument
         return 'cns';
     }
 
-    protected function doValidate(): bool
+    protected function doValidate(): ?ReasonCode
     {
         // Strip all non-digit characters to get a clean numeric string
         $digits = $this->sanitize($this->raw());
 
         // CNS (National Health Card) must have exactly 15 digits
         if (strlen($digits) !== 15) {
-            return false;
+            return ReasonCode::WrongLength;
         }
 
         $first = (int) $digits[0];
@@ -61,7 +63,7 @@ final class CNSValidation extends AbstractValidatableDocument
                 $resultado = $pis . '000' . $dv;
             }
 
-            return $digits === $resultado;
+            return $digits === $resultado ? null : ReasonCode::BadCheckDigit;
         }
 
         // ===== CNS Type 7, 8, 9: Provisional (Not Tied to PIS) =====
@@ -73,9 +75,19 @@ final class CNSValidation extends AbstractValidatableDocument
             for ($i = 0, $w = 15; $i < 15; $i++, $w--) {
                 $sum += ((int) $digits[$i]) * $w;
             }
-            return ($sum % 11) === 0;
+            return ($sum % 11) === 0 ? null : ReasonCode::BadCheckDigit;
         }
 
-        return false;
+        // Leading digit is not a recognized CNS range (1,2,7,8,9).
+        return ReasonCode::InvalidFormat;
+    }
+
+    /** CNS subtype from the leading digit: 1/2 definitive, 7/8/9 provisional. */
+    protected function extractMeta(string $normalized): DocumentMeta
+    {
+        $first = (int) $normalized[0];
+        $type = ($first === 1 || $first === 2) ? 'definitive' : 'provisional';
+
+        return new DocumentMeta(type: $type);
     }
 }

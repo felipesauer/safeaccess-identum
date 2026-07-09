@@ -1,4 +1,5 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
+import { ReasonCode } from '../../contracts/reason-code.js';
 
 /**
  * Validates Brazilian PIS/PASEP (Programa de Integração Social) numbers.
@@ -8,19 +9,19 @@ export class PISValidation extends AbstractValidatableDocument {
         return 'pis';
     }
 
-    protected doValidate(): boolean {
+    protected doValidate(): ReasonCode | null {
         // Strip all non-digit characters to get a clean numeric string
         const digits = this.sanitize(this._raw);
 
         // PIS must have exactly 11 digits
         if (digits.length !== 11) {
-            return false;
+            return ReasonCode.WrongLength;
         }
 
         // Guard: CEF (Caixa Econômica Federal) reserves all 11-same-digit sequences
         // as invalid forever—no valid PIS exists with all same digits.
         if (/^(\d)\1{10}$/.test(digits)) {
-            return false;
+            return ReasonCode.KnownInvalid;
         }
 
         // ===== Verification Digit (DV) =====
@@ -41,6 +42,6 @@ export class PISValidation extends AbstractValidatableDocument {
         }
 
         // Final verification: check if the computed DV matches the digit at position 10
-        return String(dv) === digits[10];
+        return String(dv) === digits[10] ? null : ReasonCode.BadCheckDigit;
     }
 }
