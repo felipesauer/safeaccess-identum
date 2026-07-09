@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.8](https://github.com/felipesauer/safeaccess-identum/compare/php-v0.1.7...php-v0.1.8) (2026-07-09)
+
+
+### Miscellaneous Chores
+
+* **php:** Bump friendsofphp/php-cs-fixer from 3.95.4 to 3.95.8 in /packages/php in the dev-dependencies group across 1 directory ([#42](https://github.com/felipesauer/safeaccess-identum/issues/42)) ([8b96c31](https://github.com/felipesauer/safeaccess-identum/commit/8b96c314b21a9248254f69bc05e9f5f3e8ff9edc))
+* **php:** Bump the dev-dependencies group across 1 directory with 2 updates ([#52](https://github.com/felipesauer/safeaccess-identum/issues/52)) ([68dab21](https://github.com/felipesauer/safeaccess-identum/commit/68dab2142fb36b59a9992e0213f0c7b6e493fe82))
+
 ## [0.1.7](https://github.com/felipesauer/safeaccess-identum/compare/php-v0.1.6...php-v0.1.7) (2026-06-08)
 
 
