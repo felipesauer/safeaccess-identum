@@ -1,6 +1,7 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
 import { ReasonCode } from '../../contracts/reason-code.js';
 import type { DocumentMeta } from '../../contracts/validation-result.js';
+import { randomInt } from '../../contracts/random.js';
 
 /**
  * Validates Mercosul vehicle plate numbers.
@@ -8,6 +9,17 @@ import type { DocumentMeta } from '../../contracts/validation-result.js';
 export class PlateMercosulValidation extends AbstractValidatableDocument {
     protected documentName(): string {
         return 'plate';
+    }
+
+    /**
+     * Generates a valid Mercosul plate (LLLNLNN, format-only). No separator, so
+     * there is no `formatted` option.
+     */
+    static generate(): string {
+        const letter = (): string => String.fromCharCode(65 + randomInt(0, 25));
+        const digit = (): string => String(randomInt(0, 9));
+        // Pattern LLLNLNN
+        return letter() + letter() + letter() + digit() + letter() + digit() + digit();
     }
 
     /**

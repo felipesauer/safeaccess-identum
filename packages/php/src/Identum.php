@@ -33,9 +33,21 @@ final class Identum
         return new CPFValidation($document);
     }
 
+    /** Generates a valid CPF (unmasked by default). */
+    public static function generateCpf(bool $formatted = false): string
+    {
+        return CPFValidation::generate($formatted);
+    }
+
     public static function cnpj(string $document): CNPJValidation
     {
         return new CNPJValidation($document);
+    }
+
+    /** Generates a valid (numeric) CNPJ (unmasked by default). */
+    public static function generateCnpj(bool $formatted = false): string
+    {
+        return CNPJValidation::generate($formatted);
     }
 
     public static function cnh(string $document): CNHValidation
@@ -43,9 +55,21 @@ final class Identum
         return new CNHValidation($document);
     }
 
+    /** Generates a valid CNH. */
+    public static function generateCnh(): string
+    {
+        return CNHValidation::generate();
+    }
+
     public static function cep(string $document): CEPValidation
     {
         return new CEPValidation($document);
+    }
+
+    /** Generates a valid CEP (unmasked by default). */
+    public static function generateCep(bool $formatted = false): string
+    {
+        return CEPValidation::generate($formatted);
     }
 
     public static function cns(string $document): CNSValidation
@@ -53,9 +77,21 @@ final class Identum
         return new CNSValidation($document);
     }
 
+    /** Generates a valid CNS (provisional type; unmasked by default). */
+    public static function generateCns(bool $formatted = false): string
+    {
+        return CNSValidation::generate($formatted);
+    }
+
     public static function pis(string $document): PISValidation
     {
         return new PISValidation($document);
+    }
+
+    /** Generates a valid PIS/PASEP (unmasked by default). */
+    public static function generatePis(bool $formatted = false): string
+    {
+        return PISValidation::generate($formatted);
     }
 
     public static function ie(string $document, StateEnum|int $state): IEValidation
@@ -63,9 +99,21 @@ final class Identum
         return new IEValidation($document, $state);
     }
 
+    /** Generates a valid IE for the given state (unmasked). */
+    public static function generateIe(StateEnum|int $state): string
+    {
+        return IEValidation::generate($state);
+    }
+
     public static function renavam(string $document): RenavamValidation
     {
         return new RenavamValidation($document);
+    }
+
+    /** Generates a valid RENAVAM. */
+    public static function generateRenavam(): string
+    {
+        return RenavamValidation::generate();
     }
 
     public static function placa(string $document): PlateMercosulValidation
@@ -73,8 +121,20 @@ final class Identum
         return new PlateMercosulValidation($document);
     }
 
+    /** Generates a valid Mercosul plate. */
+    public static function generatePlaca(): string
+    {
+        return PlateMercosulValidation::generate();
+    }
+
     public static function tituloEleitor(string $document): VoterTitleValidation
     {
         return new VoterTitleValidation($document);
+    }
+
+    /** Generates a valid Voter Title. */
+    public static function generateTituloEleitor(): string
+    {
+        return VoterTitleValidation::generate();
     }
 }

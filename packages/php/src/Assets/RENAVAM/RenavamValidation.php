@@ -19,6 +19,37 @@ final class RenavamValidation extends AbstractValidatableDocument
         return 'renavam';
     }
 
+    /**
+     * Generates a valid RENAVAM.
+     *
+     * @param bool $formatted RENAVAM has no canonical mask; kept for API symmetry.
+     */
+    public static function generate(bool $formatted = false): string
+    {
+        $pesos = [2, 3, 4, 5, 6, 7, 8, 9, 2, 3];
+
+        do {
+            $base = '';
+            for ($i = 0; $i < 10; $i++) {
+                $base .= random_int(0, 9);
+            }
+        } while (preg_match('/^(\d)\1{9}$/', $base . '0') === 1);
+
+        $rev = strrev($base);
+        $soma = 0;
+        for ($i = 0; $i < 10; $i++) {
+            $soma += ((int) $rev[$i]) * $pesos[$i];
+        }
+        $dv = 11 - ($soma % 11);
+        if ($dv >= 10) {
+            $dv = 0;
+        }
+
+        $value = $base . $dv;
+
+        return $formatted ? (new self($value))->format() : $value;
+    }
+
     protected function doValidate(): ?ReasonCode
     {
         // Strip all non-digit characters to get a clean numeric string

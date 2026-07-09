@@ -30,6 +30,43 @@ final class CNPJValidation extends AbstractValidatableDocument
     }
 
     /**
+     * Generates a valid (numeric) CNPJ.
+     *
+     * @param bool $formatted When true, returns the masked form (00.000.000/0000-00).
+     */
+    public static function generate(bool $formatted = false): string
+    {
+        $w1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        $w2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+
+        do {
+            $base = '';
+            for ($i = 0; $i < 12; $i++) {
+                $base .= random_int(0, 9);
+            }
+        } while (preg_match('/^(\d)\1{11}$/', $base) === 1);
+
+        $sum = 0;
+        for ($i = 0; $i < 12; $i++) {
+            $sum += ((int) $base[$i]) * $w1[$i];
+        }
+        $rest = $sum % 11;
+        $dv1 = ($rest < 2) ? 0 : 11 - $rest;
+
+        $sum = 0;
+        for ($i = 0; $i < 12; $i++) {
+            $sum += ((int) $base[$i]) * $w2[$i];
+        }
+        $sum += $dv1 * $w2[12];
+        $rest = $sum % 11;
+        $dv2 = ($rest < 2) ? 0 : 11 - $rest;
+
+        $value = $base . $dv1 . $dv2;
+
+        return $formatted ? (new self($value))->format() : $value;
+    }
+
+    /**
      * CNPJ keeps letters (alphanumeric format), so it cannot strip to digits only.
      * Uppercases and removes only formatting separators; other characters are
      * preserved so they are caught as invalid during validation.
@@ -109,5 +146,18 @@ final class CNPJValidation extends AbstractValidatableDocument
             isMatriz: $branch === '0001',
             isAlphanumeric: preg_match('/[A-Z]/', $normalized) === 1,
         );
+    }
+
+    /**
+     * Canonical CNPJ mask: XX.XXX.XXX/XXXX-YY. Alphanumeric-aware — the first 12
+     * positions may be [A-Z0-9] and only the last 2 (check digits) are numeric.
+     */
+    protected function mask(string $stripped): string
+    {
+        return preg_replace(
+            '/^([A-Z0-9]{2})([A-Z0-9]{3})([A-Z0-9]{3})([A-Z0-9]{4})(\d{2})$/',
+            '$1.$2.$3/$4-$5',
+            $stripped,
+        ) ?? $stripped;
     }
 }

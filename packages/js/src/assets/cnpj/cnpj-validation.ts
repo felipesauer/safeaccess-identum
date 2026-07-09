@@ -1,6 +1,7 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
 import { ReasonCode } from '../../contracts/reason-code.js';
 import type { DocumentMeta } from '../../contracts/validation-result.js';
+import { randomDigits } from '../../contracts/random.js';
 
 /**
  * Validates Brazilian CNPJ (Cadastro Nacional da Pessoa Jurídica) numbers.
@@ -10,6 +11,35 @@ import type { DocumentMeta } from '../../contracts/validation-result.js';
 export class CNPJValidation extends AbstractValidatableDocument {
     protected documentName(): string {
         return 'cnpj';
+    }
+
+    /**
+     * Generates a valid (numeric) CNPJ.
+     *
+     * @param formatted When true, returns the masked form (00.000.000/0000-00).
+     */
+    static generate(formatted = false): string {
+        const w1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        const w2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+
+        let base: string;
+        do {
+            base = randomDigits(12);
+        } while (/^(\d)\1{11}$/.test(base));
+
+        let sum = 0;
+        for (let i = 0; i < 12; i++) sum += Number(base[i]) * w1[i];
+        let rest = sum % 11;
+        const dv1 = rest < 2 ? 0 : 11 - rest;
+
+        sum = 0;
+        for (let i = 0; i < 12; i++) sum += Number(base[i]) * w2[i];
+        sum += dv1 * w2[12];
+        rest = sum % 11;
+        const dv2 = rest < 2 ? 0 : 11 - rest;
+
+        const value = base + dv1 + dv2;
+        return formatted ? new CNPJValidation(value).format() : value;
     }
 
     /**
@@ -84,5 +114,16 @@ export class CNPJValidation extends AbstractValidatableDocument {
             isMatriz: normalized.slice(8, 12) === '0001',
             isAlphanumeric: /[A-Z]/.test(normalized),
         };
+    }
+
+    /**
+     * Canonical CNPJ mask: XX.XXX.XXX/XXXX-YY. Alphanumeric-aware — the first 12
+     * positions may be [A-Z0-9] and only the last 2 (check digits) are numeric.
+     */
+    protected mask(stripped: string): string {
+        return stripped.replace(
+            /^([A-Z0-9]{2})([A-Z0-9]{3})([A-Z0-9]{3})([A-Z0-9]{4})(\d{2})$/,
+            '$1.$2.$3/$4-$5',
+        );
     }
 }

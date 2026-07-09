@@ -1,6 +1,7 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
 import { ReasonCode } from '../../contracts/reason-code.js';
 import type { DocumentMeta } from '../../contracts/validation-result.js';
+import { randomDigits } from '../../contracts/random.js';
 
 /**
  * Fiscal region by the 9th digit (index 8). Each digit maps to a group of
@@ -27,6 +28,39 @@ const FISCAL_REGIONS: Record<number, string> = {
 export class CPFValidation extends AbstractValidatableDocument {
     protected documentName(): string {
         return 'cpf';
+    }
+
+    /**
+     * Generates a valid CPF.
+     *
+     * @param formatted When true, returns the masked form (000.000.000-00).
+     * @returns A number that always passes {@link validate}.
+     */
+    static generate(formatted = false): string {
+        // 9 random base digits, avoiding the all-same-digit sequence (reserved as invalid).
+        let base: string;
+        do {
+            base = randomDigits(9);
+        } while (/^(\d)\1{8}$/.test(base));
+
+        const dv1 = CPFValidation.checkDigit(base, 10);
+        const dv2 = CPFValidation.checkDigit(base + dv1, 11);
+        const value = base + dv1 + dv2;
+
+        return formatted ? new CPFValidation(value).format() : value;
+    }
+
+    /**
+     * Mod-11 check digit over `digits` with descending weights starting at
+     * `startWeight`. Remainder < 2 yields 0 (the CPF convention shared with doValidate).
+     */
+    private static checkDigit(digits: string, startWeight: number): number {
+        let sum = 0;
+        for (let i = 0, w = startWeight; i < digits.length; i++, w--) {
+            sum += Number(digits[i]) * w;
+        }
+        const rest = sum % 11;
+        return rest < 2 ? 0 : 11 - rest;
     }
 
     protected doValidate(): ReasonCode | null {
@@ -76,5 +110,10 @@ export class CPFValidation extends AbstractValidatableDocument {
     /** Fiscal region (group of states) inferred from the 9th digit. */
     protected extractMeta(normalized: string): DocumentMeta {
         return { uf: FISCAL_REGIONS[Number(normalized[8])] };
+    }
+
+    /** Canonical CPF mask: 000.000.000-00. */
+    protected mask(stripped: string): string {
+        return stripped.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
     }
 }

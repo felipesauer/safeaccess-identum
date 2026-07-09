@@ -1,5 +1,6 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
 import { ReasonCode } from '../../contracts/reason-code.js';
+import { randomDigits } from '../../contracts/random.js';
 
 /**
  * Validates Brazilian RENAVAM (Registro Nacional de Veículos Automotores) numbers.
@@ -7,6 +8,29 @@ import { ReasonCode } from '../../contracts/reason-code.js';
 export class RenavamValidation extends AbstractValidatableDocument {
     protected documentName(): string {
         return 'renavam';
+    }
+
+    /**
+     * Generates a valid RENAVAM.
+     *
+     * @param formatted RENAVAM has no canonical mask; kept for API symmetry.
+     */
+    static generate(formatted = false): string {
+        const pesos = [2, 3, 4, 5, 6, 7, 8, 9, 2, 3];
+
+        let base: string;
+        do {
+            base = randomDigits(10);
+        } while (/^(\d)\1{9}$/.test(base + '0'));
+
+        const rev = base.split('').reverse().join('');
+        let soma = 0;
+        for (let i = 0; i < 10; i++) soma += Number(rev[i]) * pesos[i];
+        let dv = 11 - (soma % 11);
+        if (dv >= 10) dv = 0;
+
+        const value = base + dv;
+        return formatted ? new RenavamValidation(value).format() : value;
     }
 
     protected doValidate(): ReasonCode | null {

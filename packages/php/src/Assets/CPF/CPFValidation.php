@@ -42,6 +42,45 @@ final class CPFValidation extends AbstractValidatableDocument
     }
 
     /**
+     * Generates a valid CPF.
+     *
+     * @param bool $formatted When true, returns the masked form (000.000.000-00).
+     * @return string A number that always passes {@see validate()}.
+     */
+    public static function generate(bool $formatted = false): string
+    {
+        // 9 random base digits, avoiding the all-same-digit sequence (reserved as invalid).
+        do {
+            $base = '';
+            for ($i = 0; $i < 9; $i++) {
+                $base .= random_int(0, 9);
+            }
+        } while (preg_match('/^(\d)\1{8}$/', $base) === 1);
+
+        $dv1 = self::checkDigit($base, 10);
+        $dv2 = self::checkDigit($base . $dv1, 11);
+
+        $value = $base . $dv1 . $dv2;
+
+        return $formatted ? (new self($value))->format() : $value;
+    }
+
+    /**
+     * Mod-11 check digit over $digits with descending weights starting at $startWeight.
+     * Remainder < 2 yields 0 (the CPF convention shared with {@see doValidate()}).
+     */
+    private static function checkDigit(string $digits, int $startWeight): int
+    {
+        $sum = 0;
+        for ($i = 0, $w = $startWeight; $i < strlen($digits); $i++, $w--) {
+            $sum += ((int) $digits[$i]) * $w;
+        }
+        $rest = $sum % 11;
+
+        return ($rest < 2) ? 0 : 11 - $rest;
+    }
+
+    /**
      * Domain validation for CPF:
      * - Must have 11 digits
      * - Must not be a repeated sequence (e.g., 000..., 111..., ...)
@@ -98,5 +137,11 @@ final class CPFValidation extends AbstractValidatableDocument
         $region = self::FISCAL_REGIONS[(int) $normalized[8]] ?? null;
 
         return new DocumentMeta(uf: $region);
+    }
+
+    /** Canonical CPF mask: 000.000.000-00. */
+    protected function mask(string $stripped): string
+    {
+        return preg_replace('/^(\d{3})(\d{3})(\d{3})(\d{2})$/', '$1.$2.$3-$4', $stripped) ?? $stripped;
     }
 }

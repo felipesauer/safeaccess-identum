@@ -99,4 +99,19 @@ describe(CPFValidation::class, function () {
         expect(fn () => (new CPFValidation('864.600.120-24'))->denyList(['864.600.120-24'])->validateOrFail())
             ->toThrow(ValidationException::class);
     });
+
+    it('strip() returns the canonical unformatted value', function () {
+        expect((new CPFValidation('529.982.247-25'))->strip())->toBe('52998224725');
+        expect((new CPFValidation('52998224725'))->strip())->toBe('52998224725');
+    });
+
+    it('format() applies the canonical mask', function () {
+        expect((new CPFValidation('52998224725'))->format())->toBe('529.982.247-25');
+        expect((new CPFValidation('529.982.247-25'))->format())->toBe('529.982.247-25');
+    });
+
+    it('format() is best-effort: returns the stripped value when it does not fit the mask', function () {
+        expect((new CPFValidation('529'))->format())->toBe('529');
+        expect((new CPFValidation('529982247250000'))->format())->toBe('529982247250000');
+    });
 });

@@ -29,6 +29,15 @@ export interface ValidatableDocument {
     allowList(values: string[]): this;
     /** Returns the raw (as provided) input value. */
     raw(): string;
+    /** Returns the canonical, unformatted value (all mask characters removed). */
+    strip(): string;
+    /**
+     * Returns the value with its canonical mask applied (best-effort).
+     *
+     * Presentation helper — does not validate. If the stripped value does not
+     * fit the document's mask, the stripped value is returned unchanged.
+     */
+    format(): string;
 }
 
 /**
@@ -54,6 +63,21 @@ export abstract class AbstractValidatableDocument implements ValidatableDocument
 
     raw(): string {
         return this._raw;
+    }
+
+    /** Returns the canonical, unformatted value (all mask characters removed). */
+    strip(): string {
+        return this.sanitize(this._raw);
+    }
+
+    /**
+     * Returns the value with its canonical mask applied (best-effort).
+     *
+     * Presentation helper — does not validate. Delegates to {@link mask}, which
+     * returns the stripped value unchanged when it does not fit the mask.
+     */
+    format(): string {
+        return this.mask(this.sanitize(this._raw));
     }
 
     denyList(values: string[]): this {
@@ -137,6 +161,17 @@ export abstract class AbstractValidatableDocument implements ValidatableDocument
      */
     protected sanitize(value: string): string {
         return value.replace(/\D+/g, '');
+    }
+
+    /**
+     * Applies the document's canonical mask to an already-stripped value.
+     *
+     * Default: no mask (documents without a canonical display format). Validators
+     * with a mask (CPF, CNPJ, CEP, …) override this and must return the input
+     * unchanged when it does not fit the mask (best-effort).
+     */
+    protected mask(stripped: string): string {
+        return stripped;
     }
 
     /** Deny-list comparison is format-agnostic: both sides are sanitized first. */

@@ -1,6 +1,7 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
 import { ReasonCode } from '../../contracts/reason-code.js';
 import type { DocumentMeta } from '../../contracts/validation-result.js';
+import { randomInt, randomDigits } from '../../contracts/random.js';
 
 /**
  * Validates Brazilian CNS (Cartão Nacional de Saúde) numbers.
@@ -8,6 +9,34 @@ import type { DocumentMeta } from '../../contracts/validation-result.js';
 export class CNSValidation extends AbstractValidatableDocument {
     protected documentName(): string {
         return 'cns';
+    }
+
+    /**
+     * Generates a valid CNS (provisional type, leading 7/8/9).
+     *
+     * Provisional cards only require the weighted sum (15..1) to be divisible by
+     * 11, so we fix the first 14 digits at random and solve the last one; if no
+     * single digit closes the sum, we resample. This avoids reproducing the
+     * Ministry of Health's definitive-card (type 1/2) suffix rules.
+     *
+     * @param formatted When true, returns the masked form (000 0000 0000 0000).
+     */
+    static generate(formatted = false): string {
+        for (;;) {
+            const head = String(randomInt(7, 9)) + randomDigits(13);
+
+            // Weighted sum (weights 15..2) of the first 14 digits; the 15th weight
+            // is 1, so the last digit must make the total divisible by 11.
+            let sum = 0;
+            for (let i = 0, w = 15; i < 14; i++, w--) sum += Number(head[i]) * w;
+            const last = (11 - (sum % 11)) % 11;
+
+            if (last < 10) {
+                const value = head + last;
+                return formatted ? new CNSValidation(value).format() : value;
+            }
+            // last === 10 cannot be a single digit → resample.
+        }
     }
 
     protected doValidate(): ReasonCode | null {
@@ -77,5 +106,10 @@ export class CNSValidation extends AbstractValidatableDocument {
         const type = first === 1 || first === 2 ? 'definitive' : 'provisional';
 
         return { type };
+    }
+
+    /** Canonical CNS mask: 000 0000 0000 0000 (space-separated groups). */
+    protected mask(stripped: string): string {
+        return stripped.replace(/^(\d{3})(\d{4})(\d{4})(\d{4})$/, '$1 $2 $3 $4');
     }
 }

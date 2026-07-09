@@ -19,6 +19,34 @@ final class CNHValidation extends AbstractValidatableDocument
         return 'cnh';
     }
 
+    /**
+     * Generates a valid CNH.
+     *
+     * The DV algorithm has overflow adjustments that are awkward to invert, so we
+     * pick a random 9-digit base and scan the 100 possible check-digit pairs for
+     * the one that validates — always exactly one exists. CNH has no canonical
+     * mask, so there is no $formatted option.
+     */
+    public static function generate(): string
+    {
+        do {
+            $base = '';
+            for ($i = 0; $i < 9; $i++) {
+                $base .= random_int(0, 9);
+            }
+        } while (preg_match('/^(\d)\1{8}$/', $base) === 1);
+
+        for ($dv = 0; $dv < 100; $dv++) {
+            $candidate = $base . str_pad((string) $dv, 2, '0', STR_PAD_LEFT);
+            if ((new self($candidate))->doValidate() === null) {
+                return $candidate;
+            }
+        }
+
+        // Unreachable: a valid pair always exists for a non-repeated base.
+        return $base . '00'; // @codeCoverageIgnore
+    }
+
     protected function doValidate(): ?ReasonCode
     {
         // Strip all non-digit characters to get a clean numeric string

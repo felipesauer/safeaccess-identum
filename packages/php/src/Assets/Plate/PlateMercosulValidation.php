@@ -21,6 +21,21 @@ final class PlateMercosulValidation extends AbstractValidatableDocument
     }
 
     /**
+     * Generates a valid Mercosul plate (LLLNLNN, format-only).
+     *
+     * @param bool $formatted Mercosul plates have no separator; kept for API symmetry.
+     */
+    public static function generate(bool $formatted = false): string
+    {
+        $letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $letter = static fn (): string => $letters[random_int(0, 25)];
+        $digit = static fn (): string => (string) random_int(0, 9);
+
+        // Pattern LLLNLNN
+        return $letter() . $letter() . $letter() . $digit() . $letter() . $digit() . $digit();
+    }
+
+    /**
      * Plates are alphanumeric, so they cannot strip to digits only.
      * Uppercases and removes every non-alphanumeric character (dashes, spaces).
      */

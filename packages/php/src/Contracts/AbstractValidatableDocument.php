@@ -40,6 +40,23 @@ abstract class AbstractValidatableDocument implements ValidatableDocument
         return $this->raw;
     }
 
+    /** Returns the canonical, unformatted value (all mask characters removed). */
+    public function strip(): string
+    {
+        return $this->sanitize($this->raw);
+    }
+
+    /**
+     * Returns the value with its canonical mask applied (best-effort).
+     *
+     * Presentation helper — does not validate. Delegates to {@see mask()}, which
+     * returns the stripped value unchanged when it does not fit the mask.
+     */
+    public function format(): string
+    {
+        return $this->mask($this->sanitize($this->raw));
+    }
+
     /**
      * @param list<string> $values
      * @return static
@@ -154,6 +171,18 @@ abstract class AbstractValidatableDocument implements ValidatableDocument
     protected function sanitize(string $value): string
     {
         return preg_replace('/\D+/', '', $value) ?? '';
+    }
+
+    /**
+     * Applies the document's canonical mask to an already-stripped value.
+     *
+     * Default: no mask (documents without a canonical display format). Validators
+     * with a mask (CPF, CNPJ, CEP, …) override this and must return the input
+     * unchanged when it does not fit the mask (best-effort).
+     */
+    protected function mask(string $stripped): string
+    {
+        return $stripped;
     }
 
     /** Deny-list comparison is format-agnostic: both sides are sanitized first. */

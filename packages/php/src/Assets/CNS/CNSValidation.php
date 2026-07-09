@@ -20,6 +20,41 @@ final class CNSValidation extends AbstractValidatableDocument
         return 'cns';
     }
 
+    /**
+     * Generates a valid CNS (provisional type, leading 7/8/9).
+     *
+     * Provisional cards only require the weighted sum (15..1) to be divisible by
+     * 11, so we fix the first 14 digits at random and solve the last one; if no
+     * single digit closes the sum, we resample. This avoids reproducing the
+     * Ministry of Health's definitive-card (type 1/2) suffix rules.
+     *
+     * @param bool $formatted When true, returns the masked form (000 0000 0000 0000).
+     */
+    public static function generate(bool $formatted = false): string
+    {
+        while (true) {
+            $head = (string) random_int(7, 9);
+            for ($i = 1; $i < 14; $i++) {
+                $head .= random_int(0, 9);
+            }
+
+            // Weighted sum (weights 15..2) of the first 14 digits; the 15th weight is 1,
+            // so the last digit must make the total divisible by 11.
+            $sum = 0;
+            for ($i = 0, $w = 15; $i < 14; $i++, $w--) {
+                $sum += ((int) $head[$i]) * $w;
+            }
+            $last = (11 - ($sum % 11)) % 11;
+
+            if ($last < 10) {
+                $value = $head . $last;
+
+                return $formatted ? (new self($value))->format() : $value;
+            }
+            // last === 10 cannot be a single digit → resample.
+        }
+    }
+
     protected function doValidate(): ?ReasonCode
     {
         // Strip all non-digit characters to get a clean numeric string
@@ -89,5 +124,11 @@ final class CNSValidation extends AbstractValidatableDocument
         $type = ($first === 1 || $first === 2) ? 'definitive' : 'provisional';
 
         return new DocumentMeta(type: $type);
+    }
+
+    /** Canonical CNS mask: 000 0000 0000 0000 (space-separated groups). */
+    protected function mask(string $stripped): string
+    {
+        return preg_replace('/^(\d{3})(\d{4})(\d{4})(\d{4})$/', '$1 $2 $3 $4', $stripped) ?? $stripped;
     }
 }

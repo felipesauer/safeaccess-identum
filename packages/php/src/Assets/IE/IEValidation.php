@@ -62,6 +62,47 @@ final class IEValidation extends AbstractValidatableDocumentRules
      */
     protected string $rule;
 
+    /**
+     * Candidate digit lengths per state (IBGE code → lengths), used by {@see generate()}.
+     * States whose format requires a fixed prefix are handled in {@see randomForState()}.
+     *
+     * @var array<int, list<int>>
+     */
+    private const GENERATE_LENGTHS = [
+        StateEnum::RO->value => [9, 14],
+        StateEnum::AC->value => [13],
+        StateEnum::AM->value => [9],
+        StateEnum::RR->value => [9],
+        StateEnum::PA->value => [9],
+        StateEnum::AP->value => [9],
+        StateEnum::TO->value => [9, 11],
+        StateEnum::MA->value => [9],
+        StateEnum::PI->value => [9],
+        StateEnum::CE->value => [9],
+        StateEnum::RN->value => [9, 10],
+        StateEnum::PB->value => [9],
+        StateEnum::PE->value => [9, 14],
+        StateEnum::AL->value => [9],
+        StateEnum::SE->value => [9],
+        StateEnum::BA->value => [8, 9],
+        StateEnum::MG->value => [13],
+        StateEnum::ES->value => [9],
+        StateEnum::RJ->value => [8],
+        StateEnum::SP->value => [12],
+        StateEnum::PR->value => [10],
+        StateEnum::SC->value => [9],
+        StateEnum::RS->value => [10],
+        StateEnum::MS->value => [9],
+        StateEnum::MT->value => [11],
+        StateEnum::GO->value => [9],
+        StateEnum::DF->value => [13],
+    ];
+
+    /** Fixed leading digits some states require (IBGE code → prefix). */
+    private const GENERATE_PREFIXES = [
+        StateEnum::RN->value => '20',
+    ];
+
     public function __construct(
         string $value,
         protected StateEnum|int $state,
@@ -69,6 +110,53 @@ final class IEValidation extends AbstractValidatableDocumentRules
         parent::__construct($value);
 
         $this->doRule();
+    }
+
+    /**
+     * Generates a valid IE for the given state.
+     *
+     * Uses rejection sampling: it draws random numbers of the state's valid
+     * length(s) and keeps the first that passes {@see validate()}. This reuses the
+     * already-tested per-state rules instead of reproducing all 27 algorithms.
+     *
+     * Intended for tests/fixtures, not a hot path. States with 13-digit formats
+     * (AC, DF) have a sparser valid space and can take tens of milliseconds.
+     */
+    public static function generate(StateEnum|int $state): string
+    {
+        $code = $state instanceof StateEnum ? $state->value : $state;
+
+        if (!array_key_exists($code, self::GENERATE_LENGTHS)) {
+            throw new InvalidStateRuleException('ie', '');
+        }
+
+        $lengths = self::GENERATE_LENGTHS[$code];
+        $prefix = self::GENERATE_PREFIXES[$code] ?? '';
+
+        // Bounded attempts; the density of valid IEs is at worst ~1/1000, so this
+        // converges well within the budget for every state.
+        for ($attempt = 0; $attempt < 100000; $attempt++) {
+            $length = $lengths[random_int(0, count($lengths) - 1)];
+            $candidate = self::randomDigits($length, $prefix);
+
+            if ((new self($candidate, $state))->doValidate() === null) {
+                return $candidate;
+            }
+        }
+
+        // Unreachable in practice for the shipped state rules.
+        throw new InvalidStateRuleException('ie', ''); // @codeCoverageIgnore
+    }
+
+    /** A random numeric string of the given length, keeping any required prefix. */
+    private static function randomDigits(int $length, string $prefix): string
+    {
+        $out = $prefix;
+        for ($i = strlen($prefix); $i < $length; $i++) {
+            $out .= random_int(0, 9);
+        }
+
+        return $out;
     }
 
     /**

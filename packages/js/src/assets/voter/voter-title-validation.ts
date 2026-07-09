@@ -1,5 +1,6 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
 import { ReasonCode } from '../../contracts/reason-code.js';
+import { randomInt } from '../../contracts/random.js';
 
 /**
  * Validates Brazilian Voter Title (Título de Eleitor) numbers.
@@ -7,6 +8,28 @@ import { ReasonCode } from '../../contracts/reason-code.js';
 export class VoterTitleValidation extends AbstractValidatableDocument {
     protected documentName(): string {
         return 'voter-title';
+    }
+
+    /**
+     * Generates a valid Voter Title.
+     *
+     * @param formatted Voter Title has no canonical mask; kept for API symmetry.
+     */
+    static generate(formatted = false): string {
+        const serial = String(randomInt(1, 99999999)).padStart(8, '0');
+        const uf = String(randomInt(1, 28)).padStart(2, '0');
+
+        const w1 = [2, 3, 4, 5, 6, 7, 8, 9];
+        let sum = 0;
+        for (let i = 0; i < 8; i++) sum += Number(serial[i]) * w1[i];
+        let dv1 = sum % 11;
+        if (dv1 === 10) dv1 = 0;
+
+        let dv2 = (Number(uf[0]) * 7 + Number(uf[1]) * 8 + dv1 * 9) % 11;
+        if (dv2 === 10) dv2 = 0;
+
+        const value = serial + uf + dv1 + dv2;
+        return formatted ? new VoterTitleValidation(value).format() : value;
     }
 
     protected doValidate(): ReasonCode | null {

@@ -58,4 +58,17 @@ interface ValidatableDocument
      * Returns the raw (as provided) input value.
      */
     public function raw(): string;
+
+    /**
+     * Returns the canonical, unformatted value (all mask characters removed).
+     */
+    public function strip(): string;
+
+    /**
+     * Returns the value with its canonical mask applied (best-effort).
+     *
+     * Presentation helper — does not validate. If the stripped value does not
+     * fit the document's mask, the stripped value is returned unchanged.
+     */
+    public function format(): string;
 }
