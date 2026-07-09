@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace SafeAccess\Identum;
 
+use SafeAccess\Identum\Assets\Cartao\CartaoValidation;
 use SafeAccess\Identum\Assets\CEP\CEPValidation;
+use SafeAccess\Identum\Assets\Certidao\CertidaoValidation;
 use SafeAccess\Identum\Assets\CNH\CNHValidation;
 use SafeAccess\Identum\Assets\CNPJ\CNPJValidation;
 use SafeAccess\Identum\Assets\CNS\CNSValidation;
@@ -12,6 +14,7 @@ use SafeAccess\Identum\Assets\CPF\CPFValidation;
 use SafeAccess\Identum\Assets\IE\IEValidation;
 use SafeAccess\Identum\Assets\IE\StateEnum;
 use SafeAccess\Identum\Assets\PIS\PISValidation;
+use SafeAccess\Identum\Assets\Pix\PixValidation;
 use SafeAccess\Identum\Assets\Plate\PlateMercosulValidation;
 use SafeAccess\Identum\Assets\RENAVAM\RenavamValidation;
 use SafeAccess\Identum\Assets\Voter\VoterTitleValidation;
@@ -61,6 +64,11 @@ final class Identum
         return CNHValidation::generate();
     }
 
+    public static function cartao(string $document): CartaoValidation
+    {
+        return new CartaoValidation($document);
+    }
+
     public static function cep(string $document): CEPValidation
     {
         return new CEPValidation($document);
@@ -70,6 +78,11 @@ final class Identum
     public static function generateCep(bool $formatted = false): string
     {
         return CEPValidation::generate($formatted);
+    }
+
+    public static function certidao(string $document): CertidaoValidation
+    {
+        return new CertidaoValidation($document);
     }
 
     public static function cns(string $document): CNSValidation
@@ -92,6 +105,11 @@ final class Identum
     public static function generatePis(bool $formatted = false): string
     {
         return PISValidation::generate($formatted);
+    }
+
+    public static function pix(string $key): PixValidation
+    {
+        return new PixValidation($key);
     }
 
     public static function ie(string $document, StateEnum|int $state): IEValidation

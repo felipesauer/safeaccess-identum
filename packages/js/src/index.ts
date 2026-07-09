@@ -12,6 +12,9 @@ export { IEValidation } from './assets/ie/ie-validation.js';
 export { RenavamValidation } from './assets/renavam/renavam-validation.js';
 export { PlateMercosulValidation } from './assets/plate/plate-mercosul-validation.js';
 export { VoterTitleValidation } from './assets/voter/voter-title-validation.js';
+export { CartaoValidation } from './assets/cartao/cartao-validation.js';
+export { CertidaoValidation } from './assets/certidao/certidao-validation.js';
+export { PixValidation } from './assets/pix/pix-validation.js';
 
 // IE
 export { StateEnum } from './assets/ie/state-enum.js';

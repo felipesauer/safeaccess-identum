@@ -42,6 +42,9 @@ describe('Parity — same input, same output in PHP and TypeScript', () => {
         RENAVAM: (i) => Identum.renavam(i).validate(),
         'Plate (Mercosul)': (i) => Identum.placa(i).validate(),
         'Voter Title': (i) => Identum.tituloEleitor(i).validate(),
+        Certidão: (i) => Identum.certidao(i).validate(),
+        Cartão: (i) => Identum.cartao(i).validate(),
+        PIX: (i) => Identum.pix(i).validate(),
     };
 
     const aliasByLabel: Record<string, string> = {
@@ -54,6 +57,9 @@ describe('Parity — same input, same output in PHP and TypeScript', () => {
         RENAVAM: 'renavam',
         'Plate (Mercosul)': 'placa',
         'Voter Title': 'tituloEleitor',
+        Certidão: 'certidao',
+        Cartão: 'cartao',
+        PIX: 'pix',
     };
 
     for (const [label, run] of Object.entries(simple)) {

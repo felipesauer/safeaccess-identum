@@ -49,6 +49,9 @@ describe('Parity — same input, same output in PHP and TypeScript', function ()
         'RENAVAM' => 'renavam',
         'Plate (Mercosul)' => 'placa',
         'Voter Title' => 'tituloEleitor',
+        'Certidão' => 'certidao',
+        'Cartão' => 'cartao',
+        'PIX' => 'pix',
     ];
 
     foreach ($simple as $label => $alias) {

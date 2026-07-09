@@ -8,6 +8,9 @@ import { IEValidation } from './assets/ie/ie-validation.js';
 import { RenavamValidation } from './assets/renavam/renavam-validation.js';
 import { PlateMercosulValidation } from './assets/plate/plate-mercosul-validation.js';
 import { VoterTitleValidation } from './assets/voter/voter-title-validation.js';
+import { CartaoValidation } from './assets/cartao/cartao-validation.js';
+import { CertidaoValidation } from './assets/certidao/certidao-validation.js';
+import { PixValidation } from './assets/pix/pix-validation.js';
 import type { StateCode } from './assets/ie/state-enum.js';
 
 /**
@@ -46,6 +49,10 @@ export class Identum {
         return CNHValidation.generate();
     }
 
+    static cartao(document: string): CartaoValidation {
+        return new CartaoValidation(document);
+    }
+
     static cep(document: string): CEPValidation {
         return new CEPValidation(document);
     }
@@ -53,6 +60,10 @@ export class Identum {
     /** Generates a valid CEP (unmasked by default). */
     static generateCep(formatted = false): string {
         return CEPValidation.generate(formatted);
+    }
+
+    static certidao(document: string): CertidaoValidation {
+        return new CertidaoValidation(document);
     }
 
     static cns(document: string): CNSValidation {
@@ -71,6 +82,10 @@ export class Identum {
     /** Generates a valid PIS/PASEP (unmasked by default). */
     static generatePis(formatted = false): string {
         return PISValidation.generate(formatted);
+    }
+
+    static pix(key: string): PixValidation {
+        return new PixValidation(key);
     }
 
     static ie(document: string, state: StateCode | number): IEValidation {

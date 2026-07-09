@@ -62,6 +62,20 @@ describe(Identum::class, function () {
             ->and($ie->isValid())->toBeTrue();
     });
 
+    it('resolves the 2.0 catalog: certidao, cartao and pix', function () {
+        $certidao = Identum::certidao('00188301551987100018050000056665');
+        expect($certidao)->toBeInstanceOf(\SafeAccess\Identum\Assets\Certidao\CertidaoValidation::class)
+            ->and($certidao->isValid())->toBeTrue();
+
+        $cartao = Identum::cartao('4111111111111111');
+        expect($cartao)->toBeInstanceOf(\SafeAccess\Identum\Assets\Cartao\CartaoValidation::class)
+            ->and($cartao->isValid())->toBeTrue();
+
+        $pix = Identum::pix('pix@bcb.gov.br');
+        expect($pix)->toBeInstanceOf(\SafeAccess\Identum\Assets\Pix\PixValidation::class)
+            ->and($pix->isValid())->toBeTrue();
+    });
+
     it('returned validator supports allowList()', function () {
         expect(Identum::cpf('323.543.123-43')->allowList(['323.543.123-43'])->isValid())->toBeTrue();
     });

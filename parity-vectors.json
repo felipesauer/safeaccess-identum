@@ -54,5 +54,25 @@
     "tituloEleitor": [
         { "input": "123456781295", "valid": true },
         { "input": "000000000000", "valid": false, "reason": "known_invalid" }
+    ],
+    "certidao": [
+        { "input": "00188301551987100018050000056665", "valid": true },
+        { "input": "001883 01 55 1987 1 00018 050 0000566 65", "valid": true },
+        { "input": "00188301551987100018050000056600", "valid": false, "reason": "bad_check_digit" },
+        { "input": "123", "valid": false, "reason": "wrong_length" }
+    ],
+    "cartao": [
+        { "input": "4111111111111111", "valid": true },
+        { "input": "378282246310005", "valid": true },
+        { "input": "4111111111111112", "valid": false, "reason": "bad_check_digit" },
+        { "input": "1234567", "valid": false, "reason": "wrong_length" }
+    ],
+    "pix": [
+        { "input": "52998224725", "valid": true },
+        { "input": "pix@bcb.gov.br", "valid": true },
+        { "input": "+5510998765432", "valid": true },
+        { "input": "550e8400-e29b-41d4-a716-446655440000", "valid": true },
+        { "input": "52998224724", "valid": false, "reason": "bad_check_digit" },
+        { "input": "abc", "valid": false, "reason": "invalid_format" }
     ]
 }
