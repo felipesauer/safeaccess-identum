@@ -1,6 +1,6 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
 import { ReasonCode } from '../../contracts/reason-code.js';
-import type { DocumentMeta } from '../../contracts/validation-result.js';
+import { documentMeta, type DocumentMeta } from '../../contracts/validation-result.js';
 import { randomDigits } from '../../contracts/random.js';
 
 /**
@@ -109,7 +109,7 @@ export class CPFValidation extends AbstractValidatableDocument {
 
     /** Fiscal region (group of states) inferred from the 9th digit. */
     protected extractMeta(normalized: string): DocumentMeta {
-        return { uf: FISCAL_REGIONS[Number(normalized[8])] };
+        return documentMeta({ uf: FISCAL_REGIONS[Number(normalized[8])] ?? null });
     }
 
     /** Canonical CPF mask: 000.000.000-00. */

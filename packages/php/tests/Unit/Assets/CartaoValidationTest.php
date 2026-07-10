@@ -48,4 +48,9 @@ describe(CartaoValidation::class, function () {
         expect(fn () => (new CartaoValidation('4111111111111112'))->validateOrFail())
             ->toThrow(ValidationException::class, 'cartao: bad_check_digit');
     });
+
+    it('rejects single-digit sequences with known_invalid (pass Luhn but not real PANs)', function () {
+        expect((new CartaoValidation('0000000000000000'))->validate()->reason)->toBe(ReasonCode::KnownInvalid);
+        expect((new CartaoValidation('00000000'))->validate()->reason)->toBe(ReasonCode::KnownInvalid);
+    });
 });

@@ -1,6 +1,6 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
 import { ReasonCode } from '../../contracts/reason-code.js';
-import type { DocumentMeta } from '../../contracts/validation-result.js';
+import { documentMeta, type DocumentMeta } from '../../contracts/validation-result.js';
 import { randomInt } from '../../contracts/random.js';
 
 /**
@@ -49,6 +49,6 @@ export class PlateMercosulValidation extends AbstractValidatableDocument {
 
     /** Layout of a valid plate. This validator only accepts the Mercosul layout. */
     protected extractMeta(): DocumentMeta {
-        return { pattern: 'mercosul' };
+        return documentMeta({ pattern: 'mercosul' });
     }
 }

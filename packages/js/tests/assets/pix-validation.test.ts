@@ -43,6 +43,11 @@ describe(PixValidation.name, () => {
         expect(new PixValidation('a'.repeat(72) + '@x.com').validate().reason).toBe('invalid_format'); // 78
     });
 
+    it('accepts E.164 up to 15 digits and rejects 16 (phone key)', () => {
+        expect(new PixValidation('+' + '1'.repeat(15)).validate().meta?.keyType).toBe('phone'); // 15 digits
+        expect(new PixValidation('+' + '1'.repeat(16)).validate().reason).toBe('invalid_format'); // 16 digits
+    });
+
     it('meta is null for an invalid key', () => {
         expect(new PixValidation('abc').validate().meta).toBeNull();
     });

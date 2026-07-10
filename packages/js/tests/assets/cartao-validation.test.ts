@@ -33,10 +33,15 @@ describe(CartaoValidation.name, () => {
         expect(new CartaoValidation('6062825624254001').validate().meta?.brand).toBe('hipercard');
     });
 
-    it('leaves brand undefined for a valid but unmapped BIN (e.g. Discover)', () => {
+    it('leaves brand null for a valid but unmapped BIN (e.g. Discover)', () => {
         const result = new CartaoValidation('6011111111111117').validate();
         expect(result.valid).toBe(true);
-        expect(result.meta?.brand).toBeUndefined();
+        expect(result.meta?.brand).toBeNull();
+    });
+
+    it('rejects single-digit sequences with known_invalid (pass Luhn but not real PANs)', () => {
+        expect(new CartaoValidation('0000000000000000').validate().reason).toBe('known_invalid');
+        expect(new CartaoValidation('00000000').validate().reason).toBe('known_invalid');
     });
 
     it('validateOrFail() throws with the cartao document prefix', () => {

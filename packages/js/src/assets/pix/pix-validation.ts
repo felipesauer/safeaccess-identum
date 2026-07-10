@@ -1,13 +1,14 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
 import { ReasonCode } from '../../contracts/reason-code.js';
-import type { DocumentMeta } from '../../contracts/validation-result.js';
+import { documentMeta, type DocumentMeta } from '../../contracts/validation-result.js';
 import { CPFValidation } from '../cpf/cpf-validation.js';
 import { CNPJValidation } from '../cnpj/cnpj-validation.js';
 
 type PixKeyType = 'cpf' | 'cnpj' | 'email' | 'phone' | 'evp';
 
 const EVP = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const PHONE = /^\+[1-9][0-9]\d{1,14}$/;
+// E.164: '+' then up to 15 digits total (leading digit is non-zero).
+const PHONE = /^\+[1-9][0-9]\d{1,13}$/;
 // Pragmatic e-mail shape (W3C-ish); DICT caps the length at 77.
 const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -61,9 +62,8 @@ export class PixValidation extends AbstractValidatableDocument {
         return null;
     }
 
-    /** The detected key type (omitted when the key is invalid). */
+    /** The detected key type (null when the key is invalid — not reached on the valid path). */
     protected extractMeta(normalized: string): DocumentMeta {
-        const keyType = PixValidation.detectType(normalized);
-        return keyType === null ? {} : { keyType };
+        return documentMeta({ keyType: PixValidation.detectType(normalized) });
     }
 }

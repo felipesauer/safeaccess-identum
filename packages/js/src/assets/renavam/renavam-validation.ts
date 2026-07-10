@@ -21,7 +21,7 @@ export class RenavamValidation extends AbstractValidatableDocument {
         let base: string;
         do {
             base = randomDigits(10);
-        } while (/^(\d)\1{9}$/.test(base + '0'));
+        } while (/^(\d)\1{9}$/.test(base));
 
         const rev = base.split('').reverse().join('');
         let soma = 0;

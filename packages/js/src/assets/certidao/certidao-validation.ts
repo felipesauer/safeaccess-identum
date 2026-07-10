@@ -1,6 +1,6 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
 import { ReasonCode } from '../../contracts/reason-code.js';
-import type { DocumentMeta } from '../../contracts/validation-result.js';
+import { documentMeta, type DocumentMeta } from '../../contracts/validation-result.js';
 
 /** Book-type digit (position 15) → certificate kind. */
 const BOOK_TYPES: Record<string, string> = {
@@ -61,6 +61,6 @@ export class CertidaoValidation extends AbstractValidatableDocument {
 
     /** Certificate kind derived from the book-type digit (position 15). */
     protected extractMeta(normalized: string): DocumentMeta {
-        return { type: BOOK_TYPES[normalized[14]] };
+        return documentMeta({ type: BOOK_TYPES[normalized[14]] ?? null });
     }
 }

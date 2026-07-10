@@ -103,9 +103,11 @@ abstract class AbstractValidatableDocument implements ValidatableDocument
     {
         $normalized = $this->sanitize($this->raw);
 
-        // Allow list wins over everything, including the checksum.
+        // Allow list wins over everything, including the checksum. The value was
+        // force-accepted by the caller, not proven to be a well-formed document,
+        // so no metadata is extracted (extractMeta() assumes a validated shape).
         if ($this->isAllowed($this->raw)) {
-            return ValidationResult::valid($normalized, $this->extractMeta($normalized));
+            return ValidationResult::valid($normalized, null);
         }
 
         if ($this->isDenied($this->raw)) {
@@ -118,6 +120,7 @@ abstract class AbstractValidatableDocument implements ValidatableDocument
             return ValidationResult::invalid($reason, $normalized);
         }
 
+        // Reaching here means doValidate() passed, so $normalized has a valid shape.
         return ValidationResult::valid($normalized, $this->extractMeta($normalized));
     }
 

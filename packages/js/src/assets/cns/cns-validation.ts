@@ -1,6 +1,6 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
 import { ReasonCode } from '../../contracts/reason-code.js';
-import type { DocumentMeta } from '../../contracts/validation-result.js';
+import { documentMeta, type DocumentMeta } from '../../contracts/validation-result.js';
 import { randomInt, randomDigits } from '../../contracts/random.js';
 
 /**
@@ -105,7 +105,7 @@ export class CNSValidation extends AbstractValidatableDocument {
         const first = Number(normalized[0]);
         const type = first === 1 || first === 2 ? 'definitive' : 'provisional';
 
-        return { type };
+        return documentMeta({ type });
     }
 
     /** Canonical CNS mask: 000 0000 0000 0000 (space-separated groups). */

@@ -1,6 +1,6 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
 import { ReasonCode } from '../../contracts/reason-code.js';
-import type { DocumentMeta } from '../../contracts/validation-result.js';
+import { documentMeta, type DocumentMeta } from '../../contracts/validation-result.js';
 import { randomDigits } from '../../contracts/random.js';
 
 /**
@@ -110,10 +110,10 @@ export class CNPJValidation extends AbstractValidatableDocument {
      * check digits) and whether it uses the alphanumeric format (any letter present).
      */
     protected extractMeta(normalized: string): DocumentMeta {
-        return {
+        return documentMeta({
             isMatriz: normalized.slice(8, 12) === '0001',
             isAlphanumeric: /[A-Z]/.test(normalized),
-        };
+        });
     }
 
     /**

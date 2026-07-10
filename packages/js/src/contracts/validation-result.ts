@@ -3,26 +3,44 @@ import type { ReasonCode } from './reason-code.js';
 /**
  * Metadata extracted from a valid document, offline, from the number itself.
  *
- * Every field is optional and only populated by validators for which it is
- * meaningful (e.g. `uf` for CPF/IE, `type` for CNS). A validator that has
- * nothing to extract returns `null` for `ValidationResult.meta` instead of an
- * all-empty object. Mirrors the PHP `DocumentMeta` value object.
+ * Fixed shape: every field is always present and defaults to `null`, mirroring
+ * the PHP `DocumentMeta` value object exactly so that `meta` serializes
+ * identically across both runtimes. Only the fields meaningful to a given
+ * document carry a value (e.g. `uf` for CPF/IE, `type` for CNS); the rest are
+ * `null`. Build instances with {@link documentMeta}.
  */
 export interface DocumentMeta {
     /** Federative unit (state), e.g. 'SP' — CPF (fiscal region) and IE. */
-    readonly uf?: string;
+    readonly uf: string | null;
     /** Document subtype, e.g. CNS 'definitive'/'provisional'. */
-    readonly type?: string;
+    readonly type: string | null;
     /** Card brand inferred from the BIN (best-effort). */
-    readonly brand?: string;
+    readonly brand: string | null;
     /** PIX key type, e.g. 'cpf', 'email', 'phone', 'evp'. */
-    readonly keyType?: string;
+    readonly keyType: string | null;
     /** CNPJ: whether it is a headquarters (matriz) rather than a branch. */
-    readonly isMatriz?: boolean;
+    readonly isMatriz: boolean | null;
     /** CNPJ: whether the number uses the alphanumeric format. */
-    readonly isAlphanumeric?: boolean;
+    readonly isAlphanumeric: boolean | null;
     /** Plate layout, e.g. 'mercosul' or 'old'. */
-    readonly pattern?: string;
+    readonly pattern: string | null;
+}
+
+/**
+ * Builds a {@link DocumentMeta}, filling every unspecified field with `null`.
+ * Mirrors the PHP `DocumentMeta` constructor's named-arg defaults, keeping the
+ * object shape identical across runtimes.
+ */
+export function documentMeta(fields: Partial<DocumentMeta>): DocumentMeta {
+    return {
+        uf: fields.uf ?? null,
+        type: fields.type ?? null,
+        brand: fields.brand ?? null,
+        keyType: fields.keyType ?? null,
+        isMatriz: fields.isMatriz ?? null,
+        isAlphanumeric: fields.isAlphanumeric ?? null,
+        pattern: fields.pattern ?? null,
+    };
 }
 
 /**

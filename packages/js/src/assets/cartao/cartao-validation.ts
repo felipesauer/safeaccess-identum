@@ -1,6 +1,6 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
 import { ReasonCode } from '../../contracts/reason-code.js';
-import type { DocumentMeta } from '../../contracts/validation-result.js';
+import { documentMeta, type DocumentMeta } from '../../contracts/validation-result.js';
 
 /**
  * Brand detection by BIN, evaluated in order. Elo/Hipercard come before
@@ -48,6 +48,12 @@ export class CartaoValidation extends AbstractValidatableDocument {
             return ReasonCode.WrongLength;
         }
 
+        // Reject single-digit sequences (e.g. all zeros) — they pass Luhn but are
+        // never real PANs, consistent with the other document validators.
+        if (/^(\d)\1*$/.test(digits)) {
+            return ReasonCode.KnownInvalid;
+        }
+
         return CartaoValidation.luhnValid(digits) ? null : ReasonCode.BadCheckDigit;
     }
 
@@ -72,10 +78,10 @@ export class CartaoValidation extends AbstractValidatableDocument {
         for (const [brand, patterns] of BRAND_RULES) {
             for (const pattern of patterns) {
                 if (pattern.test(normalized)) {
-                    return { brand };
+                    return documentMeta({ brand });
                 }
             }
         }
-        return {};
+        return documentMeta({});
     }
 }

@@ -61,6 +61,12 @@ final class CartaoValidation extends AbstractValidatableDocument
             return ReasonCode::WrongLength;
         }
 
+        // Reject single-digit sequences (e.g. all zeros) — they pass Luhn but are
+        // never real PANs, consistent with the other document validators.
+        if (preg_match('/^(\d)\1*$/', $digits) === 1) {
+            return ReasonCode::KnownInvalid;
+        }
+
         return self::luhnValid($digits) ? null : ReasonCode::BadCheckDigit;
     }
 

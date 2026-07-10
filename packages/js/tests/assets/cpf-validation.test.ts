@@ -128,6 +128,26 @@ describe(CPFValidation.name, () => {
         expect(r.meta?.uf).toBe('RS'); // 9th digit (index 8) is 0 -> fiscal region RS
     });
 
+    it('meta has the full fixed shape (all fields present, non-applicable ones null) for PHP parity', () => {
+        const meta = new CPFValidation('864.600.120-24').validate().meta;
+        expect(meta).toEqual({
+            uf: 'RS',
+            type: null,
+            brand: null,
+            keyType: null,
+            isMatriz: null,
+            isAlphanumeric: null,
+            pattern: null,
+        });
+    });
+
+    it('allow-listed values are valid but carry no metadata (meta is null)', () => {
+        // The value was force-accepted, not proven a real document, so no meta is extracted.
+        const r = new CPFValidation('123').allowList(['123']).validate();
+        expect(r.valid).toBe(true);
+        expect(r.meta).toBeNull();
+    });
+
     it('validate() surfaces the reason on failure', () => {
         expect(new CPFValidation('9999999999').validate().reason).toBe('wrong_length');
         expect(new CPFValidation('00000000000').validate().reason).toBe('known_invalid');

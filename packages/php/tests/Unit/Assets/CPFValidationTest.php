@@ -24,6 +24,26 @@ describe(CPFValidation::class, function () {
         expect($result->meta?->uf)->toBe('RS'); // 9th digit (index 8) is 0 -> fiscal region RS
     });
 
+    it('meta has the full fixed shape (all fields present, non-applicable ones null) for JS parity', function () {
+        $meta = (new CPFValidation('864.600.120-24'))->validate()->meta;
+
+        expect($meta->uf)->toBe('RS')
+            ->and($meta->type)->toBeNull()
+            ->and($meta->brand)->toBeNull()
+            ->and($meta->keyType)->toBeNull()
+            ->and($meta->isMatriz)->toBeNull()
+            ->and($meta->isAlphanumeric)->toBeNull()
+            ->and($meta->pattern)->toBeNull();
+    });
+
+    it('allow-listed values are valid but carry no metadata (meta is null)', function () {
+        // The value was force-accepted, not proven a real document, so no meta is extracted
+        // (and this must not trip the extractMeta index access on a short value).
+        $result = (new CPFValidation('123'))->allowList(['123'])->validate();
+        expect($result->valid)->toBeTrue()
+            ->and($result->meta)->toBeNull();
+    });
+
     it('rejects CPF with wrong check digits (DV) with reason bad_check_digit', function () {
         $result = (new CPFValidation('323.543.123-43'))->validate();
         expect($result->valid)->toBeFalse();

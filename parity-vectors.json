@@ -65,7 +65,8 @@
         { "input": "4111111111111111", "valid": true },
         { "input": "378282246310005", "valid": true },
         { "input": "4111111111111112", "valid": false, "reason": "bad_check_digit" },
-        { "input": "1234567", "valid": false, "reason": "wrong_length" }
+        { "input": "1234567", "valid": false, "reason": "wrong_length" },
+        { "input": "0000000000000000", "valid": false, "reason": "known_invalid" }
     ],
     "pix": [
         { "input": "52998224725", "valid": true },

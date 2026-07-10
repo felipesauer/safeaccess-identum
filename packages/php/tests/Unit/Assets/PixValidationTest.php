@@ -52,6 +52,11 @@ describe(PixValidation::class, function () {
         expect((new PixValidation($tooLong))->validate()->reason)->toBe(ReasonCode::InvalidFormat);
     });
 
+    it('accepts E.164 up to 15 digits and rejects 16 (phone key)', function () {
+        expect((new PixValidation('+' . str_repeat('1', 15)))->validate()->meta?->keyType)->toBe('phone'); // 15
+        expect((new PixValidation('+' . str_repeat('1', 16)))->validate()->reason)->toBe(ReasonCode::InvalidFormat); // 16
+    });
+
     it('meta.keyType is null for an invalid key', function () {
         expect((new PixValidation('abc'))->validate()->meta)->toBeNull();
     });

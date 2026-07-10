@@ -103,9 +103,11 @@ export abstract class AbstractValidatableDocument implements ValidatableDocument
     validate(): ValidationResult {
         const normalized = this.sanitize(this._raw);
 
-        // Allow list wins over everything, including the checksum.
+        // Allow list wins over everything, including the checksum. The value was
+        // force-accepted by the caller, not proven to be a well-formed document,
+        // so no metadata is extracted (extractMeta() assumes a validated shape).
         if (this.isAllowed(this._raw)) {
-            return { valid: true, reason: null, normalized, meta: this.extractMeta(normalized) };
+            return { valid: true, reason: null, normalized, meta: null };
         }
 
         if (this.isDenied(this._raw)) {

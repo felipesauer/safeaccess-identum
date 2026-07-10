@@ -1,6 +1,6 @@
 import { AbstractValidatableDocumentRules } from '../../contracts/abstract-validatable-document-rules.js';
 import { ReasonCode } from '../../contracts/reason-code.js';
-import type { DocumentMeta } from '../../contracts/validation-result.js';
+import { documentMeta, type DocumentMeta } from '../../contracts/validation-result.js';
 import { randomInt, randomDigits } from '../../contracts/random.js';
 import { InvalidStateRuleException } from '../../exceptions/invalid-state-rule-exception.js';
 import { StateEnum } from './state-enum.js';
@@ -182,6 +182,6 @@ export class IEValidation extends AbstractValidatableDocumentRules {
             (name) => StateEnum[name as keyof typeof StateEnum] === this.state,
         );
 
-        return uf === undefined ? {} : { uf };
+        return documentMeta({ uf: uf ?? null });
     }
 }

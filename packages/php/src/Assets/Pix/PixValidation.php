@@ -23,7 +23,8 @@ use SafeAccess\Identum\Contracts\ReasonCode;
 final class PixValidation extends AbstractValidatableDocument
 {
     private const EVP = '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i';
-    private const PHONE = '/^\+[1-9][0-9]\d{1,14}$/';
+    // E.164: '+' then up to 15 digits total (leading digit is non-zero).
+    private const PHONE = '/^\+[1-9][0-9]\d{1,13}$/';
     // Pragmatic e-mail shape (W3C-ish); DICT caps the length at 77.
     private const EMAIL = '/^[^@\s]+@[^@\s]+\.[^@\s]+$/';
 

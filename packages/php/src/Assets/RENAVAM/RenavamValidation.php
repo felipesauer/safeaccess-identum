@@ -33,7 +33,7 @@ final class RenavamValidation extends AbstractValidatableDocument
             for ($i = 0; $i < 10; $i++) {
                 $base .= random_int(0, 9);
             }
-        } while (preg_match('/^(\d)\1{9}$/', $base . '0') === 1);
+        } while (preg_match('/^(\d)\1{9}$/', $base) === 1);
 
         $rev = strrev($base);
         $soma = 0;
