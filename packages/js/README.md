@@ -17,7 +17,7 @@ TypeScript/JavaScript library for validating Brazilian documents — CPF, CNPJ, 
 
 ---
 
-> **Version 2.0.** `validate()` now returns a rich result object instead of a boolean, with new capabilities (`format`, `generate`, metadata), new document types, and tree-shakeable subpath imports. Upgrading from 1.x? See the [Migration guide](../../docs/MIGRATION-2.0.md).
+> **Version 2.0.** `validate()` now returns a rich result object instead of a boolean, with new capabilities (`format`, `generate`, metadata), new document types, and tree-shakeable subpath imports. Upgrading from 1.x? See [Migrating from 1.x](https://github.com/felipesauer/safeaccess-identum#migrating-from-1x).
 
 ## Features
 

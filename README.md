@@ -51,7 +51,7 @@ The same API in TypeScript, identical output for identical input.
 
 **Don't use it as a source of business rules you can't inspect.** All validation algorithms are open, documented, and unit-tested — so you can audit exactly what's being checked. If a government specification changes, open an issue.
 
-> **Version 2.0.** `validate()` now returns a rich result object instead of a boolean, and there are new capabilities (`format`, `generate`, metadata) and document types. Upgrading from 1.x? See the [Migration guide](docs/MIGRATION-2.0.md).
+> **Version 2.0.** `validate()` now returns a rich result object instead of a boolean, and there are new capabilities (`format`, `generate`, metadata) and document types. Upgrading from 1.x? See [Migrating from 1.x](#migrating-from-1x).
 
 ## Features
 
@@ -344,6 +344,38 @@ import { CPFValidation } from '@safeaccess/identum/cpf'; // only CPF ends up in 
 ```
 
 Every document has a subpath (`/cpf`, `/cnpj`, `/ie`, `/cartao`, `/pix`, `/certidao`, …). The package is marked `sideEffects: false`. The root barrel (`@safeaccess/identum`) still re-exports everything for convenience.
+
+## Migrating from 1.x
+
+Version 2.0 reshapes the API and adds capabilities and document types. Both packages change in lockstep, so the same steps apply to PHP and TypeScript. Checksums, sanitization, and all 1.x documents are unchanged — a value valid in 1.x is still valid in 2.0.
+
+| 1.x | 2.0 | Why |
+| --- | --- | --- |
+| `validate(): bool` | `validate(): ValidationResult` — use `isValid()` for a boolean | Rich result: reason, normalized value, metadata |
+| `validateOrFail(): true` | `validateOrFail(): void`; exception carries `document` / `reason` / `normalized` | Structured errors |
+| `blacklist()` / `whitelist()` | `denyList()` / `allowList()` (old names deprecated, removed in 3.0) | Clearer terminology |
+| exception message `"cpf: input invalid"` | `"cpf: <reason>"` (e.g. `"cpf: bad_check_digit"`) | Message reflects the machine-readable reason |
+| PHP `Identum::alias()` / `getAlias()` | removed — use the concrete static factories | Facade simplified, mirrors the JS one |
+| PHP `CPFValidation::make(...)` | `new CPFValidation(...)` | The `make()` trait was removed |
+
+**The one change that touches most codebases:** `validate()` now returns an object, which is **always truthy**. Replace `validate()` used as a boolean with `isValid()`:
+
+```diff
+- if (Identum::cpf($doc)->validate()) { /* ... */ }   // ⚠️ always truthy in 2.0
++ if (Identum::cpf($doc)->isValid())  { /* ... */ }
+```
+```diff
+- if (Identum.cpf(doc).validate()) { /* ... */ }       // ⚠️ always truthy in 2.0
++ if (Identum.cpf(doc).isValid())  { /* ... */ }
+```
+
+**Checklist**
+
+- [ ] Replace `.validate()` used as a boolean with `.isValid()`.
+- [ ] Update any code that read the return value of `validateOrFail()` (now `void`).
+- [ ] Rename `blacklist`/`whitelist` → `denyList`/`allowList` (or keep the deprecated aliases for now).
+- [ ] If you parsed the exception message, switch to `$e->reason` (PHP) / `e.reason` (TS).
+- [ ] (PHP) Replace `::make(...)` with `new ...(...)` and any `Identum::alias`/`getAlias` usage with the static factories.
 
 ## Contributing
 
