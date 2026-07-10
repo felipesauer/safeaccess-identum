@@ -1,4 +1,7 @@
 import { AbstractValidatableDocumentRules } from '../../contracts/abstract-validatable-document-rules.js';
+import { ReasonCode } from '../../contracts/reason-code.js';
+import { documentMeta, type DocumentMeta } from '../../contracts/validation-result.js';
+import { randomInt, randomDigits } from '../../contracts/random.js';
 import { InvalidStateRuleException } from '../../exceptions/invalid-state-rule-exception.js';
 import { StateEnum } from './state-enum.js';
 import type { StateCode } from './state-enum.js';
@@ -72,8 +75,46 @@ const ruleMap: Record<number, RuleFactory> = {
  *
  * @throws {@link InvalidStateRuleException} When the provided state code is not supported.
  */
+/**
+ * Candidate digit lengths per state (IBGE code → lengths), used by generate().
+ * States whose format requires a fixed prefix are listed in GENERATE_PREFIXES.
+ */
+const GENERATE_LENGTHS: Record<number, number[]> = {
+    [StateEnum.RO]: [9, 14],
+    [StateEnum.AC]: [13],
+    [StateEnum.AM]: [9],
+    [StateEnum.RR]: [9],
+    [StateEnum.PA]: [9],
+    [StateEnum.AP]: [9],
+    [StateEnum.TO]: [9, 11],
+    [StateEnum.MA]: [9],
+    [StateEnum.PI]: [9],
+    [StateEnum.CE]: [9],
+    [StateEnum.RN]: [9, 10],
+    [StateEnum.PB]: [9],
+    [StateEnum.PE]: [9, 14],
+    [StateEnum.AL]: [9],
+    [StateEnum.SE]: [9],
+    [StateEnum.BA]: [8, 9],
+    [StateEnum.MG]: [13],
+    [StateEnum.ES]: [9],
+    [StateEnum.RJ]: [8],
+    [StateEnum.SP]: [12],
+    [StateEnum.PR]: [10],
+    [StateEnum.SC]: [9],
+    [StateEnum.RS]: [10],
+    [StateEnum.MS]: [9],
+    [StateEnum.MT]: [11],
+    [StateEnum.GO]: [9],
+    [StateEnum.DF]: [13],
+};
+
+/** Fixed leading digits some states require (IBGE code → prefix). */
+const GENERATE_PREFIXES: Record<number, string> = {
+    [StateEnum.RN]: '20',
+};
+
 export class IEValidation extends AbstractValidatableDocumentRules {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     private rule!: AbstractStateRule;
     private readonly state: StateCode | number;
 
@@ -83,10 +124,42 @@ export class IEValidation extends AbstractValidatableDocumentRules {
         this.doRule();
     }
 
+    /**
+     * Generates a valid IE for the given state.
+     *
+     * Uses rejection sampling: it draws random numbers of the state's valid
+     * length(s) and keeps the first that passes validate(). This reuses the
+     * already-tested per-state rules instead of reproducing all 27 algorithms.
+     *
+     * Intended for tests/fixtures, not a hot path. States with 13-digit formats
+     * (AC, DF) have a sparser valid space and can take longer.
+     */
+    static generate(state: StateCode | number): string {
+        const lengths = GENERATE_LENGTHS[state];
+        if (!lengths) {
+            throw new InvalidStateRuleException('ie', '');
+        }
+
+        const prefix = GENERATE_PREFIXES[state] ?? '';
+
+        for (let attempt = 0; attempt < 100000; attempt++) {
+            const length = lengths[randomInt(0, lengths.length - 1)];
+            const candidate = randomDigits(length, prefix);
+
+            if (new IEValidation(candidate, state).validate().valid) {
+                return candidate;
+            }
+        }
+
+        // Unreachable in practice for the shipped state rules.
+        /* c8 ignore next */
+        throw new InvalidStateRuleException('ie', '');
+    }
+
     protected doRule(): this {
         const factory = ruleMap[this.state];
         if (!factory) {
-            throw new InvalidStateRuleException('invalid state rule');
+            throw new InvalidStateRuleException('ie', this.sanitize(this._raw));
         }
 
         this.rule = factory();
@@ -98,7 +171,17 @@ export class IEValidation extends AbstractValidatableDocumentRules {
         return 'ie';
     }
 
-    protected doValidate(): boolean {
-        return this.rule.execute(this._raw);
+    protected doValidate(): ReasonCode | null {
+        return this.rule.execute(this._raw) ? null : ReasonCode.BadCheckDigit;
+    }
+
+    /** The UF is known upfront (it is the dispatch key), so echo it back as metadata. */
+    protected extractMeta(): DocumentMeta {
+        // The state was validated in the constructor (doRule), so a name always exists.
+        const uf = Object.keys(StateEnum).find(
+            (name) => StateEnum[name as keyof typeof StateEnum] === this.state,
+        );
+
+        return documentMeta({ uf: uf ?? null });
     }
 }

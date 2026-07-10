@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SafeAccess\Identum\Assets\RENAVAM;
 
 use SafeAccess\Identum\Contracts\AbstractValidatableDocument;
+use SafeAccess\Identum\Contracts\ReasonCode;
 
 /**
  * Validates Brazilian RENAVAM (Registro Nacional de Veículos Automotores) numbers.
@@ -18,19 +19,50 @@ final class RenavamValidation extends AbstractValidatableDocument
         return 'renavam';
     }
 
-    protected function doValidate(): bool
+    /**
+     * Generates a valid RENAVAM.
+     *
+     * @param bool $formatted RENAVAM has no canonical mask; kept for API symmetry.
+     */
+    public static function generate(bool $formatted = false): string
+    {
+        $pesos = [2, 3, 4, 5, 6, 7, 8, 9, 2, 3];
+
+        do {
+            $base = '';
+            for ($i = 0; $i < 10; $i++) {
+                $base .= random_int(0, 9);
+            }
+        } while (preg_match('/^(\d)\1{9}$/', $base) === 1);
+
+        $rev = strrev($base);
+        $soma = 0;
+        for ($i = 0; $i < 10; $i++) {
+            $soma += ((int) $rev[$i]) * $pesos[$i];
+        }
+        $dv = 11 - ($soma % 11);
+        if ($dv >= 10) {
+            $dv = 0;
+        }
+
+        $value = $base . $dv;
+
+        return $formatted ? (new self($value))->format() : $value;
+    }
+
+    protected function doValidate(): ?ReasonCode
     {
         // Strip all non-digit characters to get a clean numeric string
         $digits = $this->sanitize($this->raw());
 
         // RENAVAM must have exactly 11 digits
         if (strlen($digits) !== 11) {
-            return false;
+            return ReasonCode::WrongLength;
         }
 
         // Guard: DENATRAN (Brazilian national vehicle registry) does not assign all-same-digit sequences
         if (preg_match('/^(\d)\1{10}$/', $digits) === 1) {
-            return false;
+            return ReasonCode::KnownInvalid;
         }
 
         $base = substr($digits, 0, 10);
@@ -54,6 +86,6 @@ final class RenavamValidation extends AbstractValidatableDocument
         }
 
         // Final verification: check if computed DV matches the check digit at position 10
-        return $dv === $dvIn;
+        return $dv === $dvIn ? null : ReasonCode::BadCheckDigit;
     }
 }

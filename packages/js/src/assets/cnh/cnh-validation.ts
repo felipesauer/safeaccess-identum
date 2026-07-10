@@ -1,4 +1,6 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
+import { ReasonCode } from '../../contracts/reason-code.js';
+import { randomDigits } from '../../contracts/random.js';
 
 /**
  * Validates Brazilian CNH (Carteira Nacional de Habilitação) numbers.
@@ -15,18 +17,44 @@ export class CNHValidation extends AbstractValidatableDocument {
         return 'cnh';
     }
 
-    protected doValidate(): boolean {
+    /**
+     * Generates a valid CNH.
+     *
+     * The DV algorithm has overflow adjustments that are awkward to invert, so we
+     * pick a random 9-digit base and scan the 100 possible check-digit pairs for
+     * the one that validates — always exactly one exists. CNH has no canonical
+     * mask, so there is no `formatted` option.
+     */
+    static generate(): string {
+        let base: string;
+        do {
+            base = randomDigits(9);
+        } while (/^(\d)\1{8}$/.test(base));
+
+        for (let dv = 0; dv < 100; dv++) {
+            const candidate = base + String(dv).padStart(2, '0');
+            if (new CNHValidation(candidate).validate().valid) {
+                return candidate;
+            }
+        }
+
+        // Unreachable: a valid pair always exists for a non-repeated base.
+        /* c8 ignore next */
+        return base + '00';
+    }
+
+    protected doValidate(): ReasonCode | null {
         // Strip all non-digit characters to get a clean numeric string
         const digits = this.sanitize(this._raw);
 
         // CNH must have exactly 11 digits
         if (digits.length !== 11) {
-            return false;
+            return ReasonCode.WrongLength;
         }
 
         // Guard: DETRAN (Brazilian traffic authority) does not issue sequential same-digit blocks
         if (/^(\d)\1{10}$/.test(digits)) {
-            return false;
+            return ReasonCode.KnownInvalid;
         }
 
         const base = digits.slice(0, 9);
@@ -71,6 +99,6 @@ export class CNHValidation extends AbstractValidatableDocument {
         }
 
         // Final verification: check if computed DV1/DV2 match the informed check digits
-        return dvInformed1 === dv1 && dvInformed2 === dv2;
+        return dvInformed1 === dv1 && dvInformed2 === dv2 ? null : ReasonCode.BadCheckDigit;
     }
 }

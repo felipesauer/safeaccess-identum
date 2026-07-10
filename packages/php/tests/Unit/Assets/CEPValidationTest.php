@@ -8,30 +8,30 @@ use SafeAccess\Identum\Exceptions\ValidationException;
 describe(CEPValidation::class, function () {
 
     it('accepts CEP masked and unmasked', function () {
-        expect((new CEPValidation('78000-000'))->validate())->toBeTrue();
-        expect((new CEPValidation('01310923'))->validate())->toBeTrue();
+        expect((new CEPValidation('78000-000'))->isValid())->toBeTrue();
+        expect((new CEPValidation('01310923'))->isValid())->toBeTrue();
     });
 
     it('rejects wrong length or empty', function () {
-        expect((new CEPValidation('78000-00'))->validate())->toBeFalse();  // 7
-        expect((new CEPValidation('013109230'))->validate())->toBeFalse(); // 9
-        expect((new CEPValidation(''))->validate())->toBeFalse();
+        expect((new CEPValidation('78000-00'))->isValid())->toBeFalse();  // 7
+        expect((new CEPValidation('013109230'))->isValid())->toBeFalse(); // 9
+        expect((new CEPValidation(''))->isValid())->toBeFalse();
     });
 
     it('ignores non-digits before validating', function () {
         $a = new CEPValidation('  78000-000 ');
         $b = new CEPValidation('78000000');
-        expect($a->validate())->toBeTrue();
-        expect($b->validate())->toBeTrue();
+        expect($a->isValid())->toBeTrue();
+        expect($b->isValid())->toBeTrue();
     });
 
     it('supports whitelist and blacklist short-circuits', function () {
-        $w = (new CEPValidation('00000-000'))->whitelist(['00000-000']);
-        expect($w->validate())->toBeTrue()
-            ->and($w->validateOrFail())->toBeTrue();
+        $w = (new CEPValidation('00000-000'))->allowList(['00000-000']);
+        expect($w->isValid())->toBeTrue()
+            ->and($w->validateOrFail())->toBeNull();
 
-        $b = (new CEPValidation('78000-000'))->blacklist(['78000-000']);
-        expect($b->validate())->toBeFalse();
+        $b = (new CEPValidation('78000-000'))->denyList(['78000-000']);
+        expect($b->isValid())->toBeFalse();
         expect(fn () => $b->validateOrFail())->toThrow(ValidationException::class);
     });
 });

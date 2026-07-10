@@ -1,4 +1,24 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
+import { ReasonCode } from '../../contracts/reason-code.js';
+import { documentMeta, type DocumentMeta } from '../../contracts/validation-result.js';
+import { randomDigits } from '../../contracts/random.js';
+
+/**
+ * Fiscal region by the 9th digit (index 8). Each digit maps to a group of
+ * states, not a single UF, so the value is the region's state list.
+ */
+const FISCAL_REGIONS: Record<number, string> = {
+    0: 'RS',
+    1: 'DF-GO-MS-MT-TO',
+    2: 'AC-AM-AP-PA-RO-RR',
+    3: 'CE-MA-PI',
+    4: 'AL-PB-PE-RN',
+    5: 'BA-SE',
+    6: 'MG',
+    7: 'ES-RJ',
+    8: 'SP',
+    9: 'PR-SC',
+};
 
 /**
  * Validates Brazilian CPF (Cadastro de Pessoas Físicas) numbers.
@@ -10,19 +30,52 @@ export class CPFValidation extends AbstractValidatableDocument {
         return 'cpf';
     }
 
-    protected doValidate(): boolean {
+    /**
+     * Generates a valid CPF.
+     *
+     * @param formatted When true, returns the masked form (000.000.000-00).
+     * @returns A number that always passes {@link validate}.
+     */
+    static generate(formatted = false): string {
+        // 9 random base digits, avoiding the all-same-digit sequence (reserved as invalid).
+        let base: string;
+        do {
+            base = randomDigits(9);
+        } while (/^(\d)\1{8}$/.test(base));
+
+        const dv1 = CPFValidation.checkDigit(base, 10);
+        const dv2 = CPFValidation.checkDigit(base + dv1, 11);
+        const value = base + dv1 + dv2;
+
+        return formatted ? new CPFValidation(value).format() : value;
+    }
+
+    /**
+     * Mod-11 check digit over `digits` with descending weights starting at
+     * `startWeight`. Remainder < 2 yields 0 (the CPF convention shared with doValidate).
+     */
+    private static checkDigit(digits: string, startWeight: number): number {
+        let sum = 0;
+        for (let i = 0, w = startWeight; i < digits.length; i++, w--) {
+            sum += Number(digits[i]) * w;
+        }
+        const rest = sum % 11;
+        return rest < 2 ? 0 : 11 - rest;
+    }
+
+    protected doValidate(): ReasonCode | null {
         // Strip all non-digit characters to get a clean numeric string
         const digits = this.sanitize(this._raw);
 
         // CPF must have exactly 11 digits
         if (digits.length !== 11) {
-            return false;
+            return ReasonCode.WrongLength;
         }
 
         // Guard: Receita Federal (Brazilian tax authority) reserves all 11-same-digit sequences
         // (e.g., 000...000, 111...111) as invalid forever — no valid CPF exists with all same digits.
         if (/^(\d)\1{10}$/.test(digits)) {
-            return false;
+            return ReasonCode.KnownInvalid;
         }
 
         // ===== First Verification Digit (DV1) =====
@@ -47,6 +100,20 @@ export class CPFValidation extends AbstractValidatableDocument {
         const dv2 = rest2 < 2 ? 0 : 11 - rest2;
 
         // Final verification: check if the computed DV1/DV2 match the digits at positions 9 and 10
-        return digits[9] === String(dv1) && digits[10] === String(dv2);
+        if (digits[9] !== String(dv1) || digits[10] !== String(dv2)) {
+            return ReasonCode.BadCheckDigit;
+        }
+
+        return null;
+    }
+
+    /** Fiscal region (group of states) inferred from the 9th digit. */
+    protected extractMeta(normalized: string): DocumentMeta {
+        return documentMeta({ uf: FISCAL_REGIONS[Number(normalized[8])] ?? null });
+    }
+
+    /** Canonical CPF mask: 000.000.000-00. */
+    protected mask(stripped: string): string {
+        return stripped.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
     }
 }

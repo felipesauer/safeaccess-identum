@@ -1,4 +1,6 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
+import { ReasonCode } from '../../contracts/reason-code.js';
+import { randomDigits } from '../../contracts/random.js';
 
 /**
  * Validates Brazilian RENAVAM (Registro Nacional de Veículos Automotores) numbers.
@@ -8,18 +10,41 @@ export class RenavamValidation extends AbstractValidatableDocument {
         return 'renavam';
     }
 
-    protected doValidate(): boolean {
+    /**
+     * Generates a valid RENAVAM.
+     *
+     * @param formatted RENAVAM has no canonical mask; kept for API symmetry.
+     */
+    static generate(formatted = false): string {
+        const pesos = [2, 3, 4, 5, 6, 7, 8, 9, 2, 3];
+
+        let base: string;
+        do {
+            base = randomDigits(10);
+        } while (/^(\d)\1{9}$/.test(base));
+
+        const rev = base.split('').reverse().join('');
+        let soma = 0;
+        for (let i = 0; i < 10; i++) soma += Number(rev[i]) * pesos[i];
+        let dv = 11 - (soma % 11);
+        if (dv >= 10) dv = 0;
+
+        const value = base + dv;
+        return formatted ? new RenavamValidation(value).format() : value;
+    }
+
+    protected doValidate(): ReasonCode | null {
         // Strip all non-digit characters to get a clean numeric string
         const digits = this.sanitize(this._raw);
 
         // RENAVAM must have exactly 11 digits
         if (digits.length !== 11) {
-            return false;
+            return ReasonCode.WrongLength;
         }
 
         // Guard: DENATRAN (Brazilian national vehicle registry) does not assign all-same-digit sequences
         if (/^(\d)\1{10}$/.test(digits)) {
-            return false;
+            return ReasonCode.KnownInvalid;
         }
 
         const base = digits.slice(0, 10);
@@ -43,6 +68,6 @@ export class RenavamValidation extends AbstractValidatableDocument {
         }
 
         // Final verification: check if computed DV matches the check digit at position 10
-        return dv === dvIn;
+        return dv === dvIn ? null : ReasonCode.BadCheckDigit;
     }
 }

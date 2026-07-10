@@ -16,7 +16,7 @@ use SafeAccess\Identum\Identum;
 /**
  * Loads the shared parity vectors from the repository root.
  *
- * @return array<string, list<array{input: string, valid: bool, state?: string}>>
+ * @return array<string, list<array{input: string, valid: bool, state?: string, reason?: string|null}>>
  */
 function parityVectors(): array
 {
@@ -27,7 +27,7 @@ function parityVectors(): array
         throw new RuntimeException("Unable to read parity vectors at {$path}");
     }
 
-    /** @var array<string, list<array{input: string, valid: bool, state?: string}>> $data */
+    /** @var array<string, list<array{input: string, valid: bool, state?: string, reason?: string|null}>> $data */
     $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
 
     return $data;
@@ -49,13 +49,20 @@ describe('Parity — same input, same output in PHP and TypeScript', function ()
         'RENAVAM' => 'renavam',
         'Plate (Mercosul)' => 'placa',
         'Voter Title' => 'tituloEleitor',
+        'Certidão' => 'certidao',
+        'Cartão' => 'cartao',
+        'PIX' => 'pix',
     ];
 
     foreach ($simple as $label => $alias) {
         describe($label, function () use ($vectors, $alias, $verb) {
             foreach ($vectors[$alias] as $case) {
                 it("{$verb($case['valid'])} {$case['input']}", function () use ($alias, $case) {
-                    expect(Identum::$alias($case['input'])->validate())->toBe($case['valid']);
+                    $result = Identum::$alias($case['input'])->validate();
+                    expect($result->valid)->toBe($case['valid']);
+                    if (array_key_exists('reason', $case)) {
+                        expect($result->reason?->value)->toBe($case['reason']);
+                    }
                 });
             }
         });
@@ -66,7 +73,11 @@ describe('Parity — same input, same output in PHP and TypeScript', function ()
             it("{$verb($case['valid'])} {$case['input']} ({$case['state']})", function () use ($case) {
                 /** @var StateEnum $state */
                 $state = constant(StateEnum::class . '::' . $case['state']);
-                expect(Identum::ie($case['input'], $state)->validate())->toBe($case['valid']);
+                $result = Identum::ie($case['input'], $state)->validate();
+                expect($result->valid)->toBe($case['valid']);
+                if (array_key_exists('reason', $case)) {
+                    expect($result->reason?->value)->toBe($case['reason']);
+                }
             });
         }
     });

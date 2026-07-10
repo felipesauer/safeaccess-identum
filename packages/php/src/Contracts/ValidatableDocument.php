@@ -9,8 +9,9 @@ use SafeAccess\Identum\Exceptions\ValidationException;
 /**
  * Contract for document validators.
  *
- * Defines the public API that all document validators must implement,
- * including validation, failure handling, and input access.
+ * Defines the public API that all document validators must implement:
+ * rich validation, a boolean shortcut, throwing validation, format-agnostic
+ * allow/deny lists, and access to the raw input.
  *
  * @api
  *
@@ -19,41 +20,55 @@ use SafeAccess\Identum\Exceptions\ValidationException;
 interface ValidatableDocument
 {
     /**
-     * Validates the current value.
+     * Validates the current value and returns a rich result.
      *
-     * @return bool True when valid, false otherwise.
+     * @return ValidationResult Outcome carrying validity, reason, normalized form and metadata.
      */
-    public function validate(): bool;
+    public function validate(): ValidationResult;
 
     /**
-     * Validates or throws a ValidationException with a concise reason.
-     *
-     * @return true
-     *
-     * @throws ValidationException
+     * Boolean shortcut for {@see validate()} — true when valid.
      */
-    public function validateOrFail(): true;
+    public function isValid(): bool;
 
     /**
-     * Sets values that should be considered invalid by default.
+     * Validates or throws.
+     *
+     * @throws ValidationException When the value is invalid; carries the structured reason.
+     */
+    public function validateOrFail(): void;
+
+    /**
+     * Force-rejects the given values regardless of checksum (format-agnostic).
      *
      * @param list<string> $values
      * @return static
      */
-    public function blacklist(array $values): static;
+    public function denyList(array $values): static;
 
     /**
-     * Sets values that should be considered valid by default.
+     * Force-accepts the given values regardless of checksum (format-agnostic).
      *
      * @param list<string> $values
      * @return static
      */
-    public function whitelist(array $values): static;
+    public function allowList(array $values): static;
 
     /**
      * Returns the raw (as provided) input value.
-     *
-     * @return string
      */
     public function raw(): string;
+
+    /**
+     * Returns the canonical, unformatted value (all mask characters removed).
+     */
+    public function strip(): string;
+
+    /**
+     * Returns the value with its canonical mask applied (best-effort).
+     *
+     * Presentation helper — does not validate. If the stripped value does not
+     * fit the document's mask, the stripped value is returned unchanged.
+     */
+    public function format(): string;
 }

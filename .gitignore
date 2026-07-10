@@ -59,3 +59,5 @@ tmp/
 .github/skills/
 .github/copilot-instructions.md
 .stryker-tmp/
+# Local-only working docs (not versioned by request)
+docs/

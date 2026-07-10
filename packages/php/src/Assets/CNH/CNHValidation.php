@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SafeAccess\Identum\Assets\CNH;
 
 use SafeAccess\Identum\Contracts\AbstractValidatableDocument;
+use SafeAccess\Identum\Contracts\ReasonCode;
 
 /**
  * Validates Brazilian CNH (Carteira Nacional de Habilitação) numbers.
@@ -18,19 +19,47 @@ final class CNHValidation extends AbstractValidatableDocument
         return 'cnh';
     }
 
-    protected function doValidate(): bool
+    /**
+     * Generates a valid CNH.
+     *
+     * The DV algorithm has overflow adjustments that are awkward to invert, so we
+     * pick a random 9-digit base and scan the 100 possible check-digit pairs for
+     * the one that validates — always exactly one exists. CNH has no canonical
+     * mask, so there is no $formatted option.
+     */
+    public static function generate(): string
+    {
+        do {
+            $base = '';
+            for ($i = 0; $i < 9; $i++) {
+                $base .= random_int(0, 9);
+            }
+        } while (preg_match('/^(\d)\1{8}$/', $base) === 1);
+
+        for ($dv = 0; $dv < 100; $dv++) {
+            $candidate = $base . str_pad((string) $dv, 2, '0', STR_PAD_LEFT);
+            if ((new self($candidate))->doValidate() === null) {
+                return $candidate;
+            }
+        }
+
+        // Unreachable: a valid pair always exists for a non-repeated base.
+        return $base . '00'; // @codeCoverageIgnore
+    }
+
+    protected function doValidate(): ?ReasonCode
     {
         // Strip all non-digit characters to get a clean numeric string
         $digits = $this->sanitize($this->raw());
 
         // CNH must have exactly 11 digits
         if (strlen($digits) !== 11) {
-            return false;
+            return ReasonCode::WrongLength;
         }
 
         // Guard: DETRAN (Brazilian traffic authority) does not issue sequential same-digit blocks
         if (preg_match('/^(\d)\1{10}$/', $digits) === 1) {
-            return false;
+            return ReasonCode::KnownInvalid;
         }
 
         $base = substr($digits, 0, 9);
@@ -75,6 +104,6 @@ final class CNHValidation extends AbstractValidatableDocument
         }
 
         // Final verification: check if computed DV1/DV2 match the informed check digits
-        return $dvInformed1 === $dv1 && $dvInformed2 === $dv2;
+        return $dvInformed1 === $dv1 && $dvInformed2 === $dv2 ? null : ReasonCode::BadCheckDigit;
     }
 }

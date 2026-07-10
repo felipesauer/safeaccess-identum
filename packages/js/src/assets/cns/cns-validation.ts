@@ -1,4 +1,7 @@
 import { AbstractValidatableDocument } from '../../contracts/abstract-validatable-document.js';
+import { ReasonCode } from '../../contracts/reason-code.js';
+import { documentMeta, type DocumentMeta } from '../../contracts/validation-result.js';
+import { randomInt, randomDigits } from '../../contracts/random.js';
 
 /**
  * Validates Brazilian CNS (Cartão Nacional de Saúde) numbers.
@@ -8,13 +11,41 @@ export class CNSValidation extends AbstractValidatableDocument {
         return 'cns';
     }
 
-    protected doValidate(): boolean {
+    /**
+     * Generates a valid CNS (provisional type, leading 7/8/9).
+     *
+     * Provisional cards only require the weighted sum (15..1) to be divisible by
+     * 11, so we fix the first 14 digits at random and solve the last one; if no
+     * single digit closes the sum, we resample. This avoids reproducing the
+     * Ministry of Health's definitive-card (type 1/2) suffix rules.
+     *
+     * @param formatted When true, returns the masked form (000 0000 0000 0000).
+     */
+    static generate(formatted = false): string {
+        for (;;) {
+            const head = String(randomInt(7, 9)) + randomDigits(13);
+
+            // Weighted sum (weights 15..2) of the first 14 digits; the 15th weight
+            // is 1, so the last digit must make the total divisible by 11.
+            let sum = 0;
+            for (let i = 0, w = 15; i < 14; i++, w--) sum += Number(head[i]) * w;
+            const last = (11 - (sum % 11)) % 11;
+
+            if (last < 10) {
+                const value = head + last;
+                return formatted ? new CNSValidation(value).format() : value;
+            }
+            // last === 10 cannot be a single digit → resample.
+        }
+    }
+
+    protected doValidate(): ReasonCode | null {
         // Strip all non-digit characters to get a clean numeric string
         const digits = this.sanitize(this._raw);
 
         // CNS (National Health Card) must have exactly 15 digits
         if (digits.length !== 15) {
-            return false;
+            return ReasonCode.WrongLength;
         }
 
         const first = Number(digits[0]);
@@ -50,7 +81,7 @@ export class CNSValidation extends AbstractValidatableDocument {
                 resultado = pis + '000' + String(dv);
             }
 
-            return digits === resultado;
+            return digits === resultado ? null : ReasonCode.BadCheckDigit;
         }
 
         // ===== CNS Type 7, 8, 9: Provisional (Not Tied to PIS) =====
@@ -62,9 +93,23 @@ export class CNSValidation extends AbstractValidatableDocument {
             for (let i = 0, w = 15; i < 15; i++, w--) {
                 sum += Number(digits[i]) * w;
             }
-            return sum % 11 === 0;
+            return sum % 11 === 0 ? null : ReasonCode.BadCheckDigit;
         }
 
-        return false;
+        // Leading digit is not a recognized CNS range (1,2,7,8,9).
+        return ReasonCode.InvalidFormat;
+    }
+
+    /** CNS subtype from the leading digit: 1/2 definitive, 7/8/9 provisional. */
+    protected extractMeta(normalized: string): DocumentMeta {
+        const first = Number(normalized[0]);
+        const type = first === 1 || first === 2 ? 'definitive' : 'provisional';
+
+        return documentMeta({ type });
+    }
+
+    /** Canonical CNS mask: 000 0000 0000 0000 (space-separated groups). */
+    protected mask(stripped: string): string {
+        return stripped.replace(/^(\d{3})(\d{4})(\d{4})(\d{4})$/, '$1 $2 $3 $4');
     }
 }
