@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/felipesauer/safeaccess-identum/compare/php-v0.2.0...php-v0.2.1) (2026-07-14)
+
+
+### Miscellaneous Chores
+
+* **php:** Bump friendsofphp/php-cs-fixer from 3.95.11 to 3.95.13 in /packages/php in the dev-dependencies group ([#57](https://github.com/felipesauer/safeaccess-identum/issues/57)) ([d6dde17](https://github.com/felipesauer/safeaccess-identum/commit/d6dde178058541993e5f2cd2cca96147e8b5c2cd))
+
 ## [0.2.0](https://github.com/felipesauer/safeaccess-identum/compare/php-v0.1.8...php-v0.2.0) (2026-07-10)
 
 
