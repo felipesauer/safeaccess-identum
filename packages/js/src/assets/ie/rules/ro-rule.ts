@@ -19,7 +19,10 @@ export class RoRule extends AbstractStateRule {
     }
 
     private validate14(d: string): boolean {
-        const dv = this.dvMod11(this.toIntArray(d.slice(0, 13)), [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+        const dv = this.dvMod11(
+            this.toIntArray(d.slice(0, 13)),
+            [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2],
+        );
         return Number(d[13]) === dv;
     }
 

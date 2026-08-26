@@ -18,7 +18,11 @@ describe('Identum generators produce valid documents', () => {
         ['PIS', () => Identum.generatePis(), (v) => Identum.pis(v).isValid()],
         ['RENAVAM', () => Identum.generateRenavam(), (v) => Identum.renavam(v).isValid()],
         ['Plate', () => Identum.generatePlaca(), (v) => Identum.placa(v).isValid()],
-        ['Voter Title', () => Identum.generateTituloEleitor(), (v) => Identum.tituloEleitor(v).isValid()],
+        [
+            'Voter Title',
+            () => Identum.generateTituloEleitor(),
+            (v) => Identum.tituloEleitor(v).isValid(),
+        ],
     ];
 
     for (const [label, gen, val] of simple) {

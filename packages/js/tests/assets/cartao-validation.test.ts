@@ -45,8 +45,12 @@ describe(CartaoValidation.name, () => {
     });
 
     it('validateOrFail() throws with the cartao document prefix', () => {
-        expect(() => new CartaoValidation('4111111111111112').validateOrFail()).toThrow(ValidationException);
-        expect(() => new CartaoValidation('4111111111111112').validateOrFail()).toThrow('cartao: bad_check_digit');
+        expect(() => new CartaoValidation('4111111111111112').validateOrFail()).toThrow(
+            ValidationException,
+        );
+        expect(() => new CartaoValidation('4111111111111112').validateOrFail()).toThrow(
+            'cartao: bad_check_digit',
+        );
     });
 
     /**
@@ -200,7 +204,9 @@ describe(CartaoValidation.name, () => {
     });
 
     it('accepts the shortest and longest ISO/IEC 7812 lengths', () => {
-        expect(new CartaoValidation('4111111111111111111').validate().reason).toBe('bad_check_digit'); // 19, Luhn fails
+        expect(new CartaoValidation('4111111111111111111').validate().reason).toBe(
+            'bad_check_digit',
+        ); // 19, Luhn fails
         expect(new CartaoValidation('4111111111111111').isValid()).toBe(true); // 16
         expect(new CartaoValidation('12345674').isValid()).toBe(true); // 8, Luhn-valid
         expect(new CartaoValidation('123456740').validate().reason).toBe('bad_check_digit'); // 9

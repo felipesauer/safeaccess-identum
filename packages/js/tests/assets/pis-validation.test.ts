@@ -31,7 +31,9 @@ describe(PISValidation.name, () => {
     });
 
     it('supports whitelist and blacklist with validateOrFail', () => {
-        expect(new PISValidation('12345678901').allowList(['12345678901']).validateOrFail()).toBeUndefined();
+        expect(
+            new PISValidation('12345678901').allowList(['12345678901']).validateOrFail(),
+        ).toBeUndefined();
 
         const bl = new PISValidation('19121693121').denyList(['19121693121']);
         expect(bl.isValid()).toBe(false);

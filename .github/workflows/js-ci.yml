@@ -4,13 +4,13 @@ on:
     push:
         branches: [main]
         paths:
-            - "packages/js/**"
-            - ".github/workflows/js-ci.yml"
+            - 'packages/js/**'
+            - '.github/workflows/js-ci.yml'
     pull_request:
         branches: [main]
         paths:
-            - "packages/js/**"
-            - ".github/workflows/js-ci.yml"
+            - 'packages/js/**'
+            - '.github/workflows/js-ci.yml'
     workflow_dispatch:
 
 permissions:
@@ -23,7 +23,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node: ["22", "24"]
+                node: ['22', '24']
 
         defaults:
             run:
@@ -76,4 +76,3 @@ jobs:
               run: npm run test:mutation
               env:
                   STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
-

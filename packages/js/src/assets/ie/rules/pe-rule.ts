@@ -18,10 +18,11 @@ export class PeRule extends AbstractStateRule {
     }
 
     private validate14(d: string): boolean {
-        const rest = this.sumProducts(
-            this.toIntArray(d.slice(0, 13)),
-            [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2, 9],
-        ) % 11;
+        const rest =
+            this.sumProducts(
+                this.toIntArray(d.slice(0, 13)),
+                [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2, 9],
+            ) % 11;
         const dv = rest < 2 ? 0 : 11 - rest;
         return Number(d[13]) === dv;
     }

@@ -27,7 +27,10 @@ export class PlateMercosulValidation extends AbstractValidatableDocument {
      * Uppercases and removes every non-alphanumeric character (dashes, spaces).
      */
     protected sanitize(value: string): string {
-        return value.toUpperCase().trim().replace(/[^A-Z0-9]/g, '');
+        return value
+            .toUpperCase()
+            .trim()
+            .replace(/[^A-Z0-9]/g, '');
     }
 
     protected doValidate(): ReasonCode | null {

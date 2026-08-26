@@ -20,7 +20,9 @@ describe(CNSValidation.name, () => {
     });
 
     it('whitelist wins and blacklist blocks even if domain logic disagrees', () => {
-        expect(new CNSValidation('300000000000000').allowList(['300000000000000']).validateOrFail()).toBeUndefined();
+        expect(
+            new CNSValidation('300000000000000').allowList(['300000000000000']).validateOrFail(),
+        ).toBeUndefined();
 
         const bl = new CNSValidation('100000000000007').denyList(['100000000000007']);
         expect(bl.isValid()).toBe(false);
