@@ -21,7 +21,7 @@
             "initial-version": "0.1.0",
             "changelog-path": "CHANGELOG.md",
             "bump-minor-pre-major": true,
-            "bump-patch-for-minor-pre-major": true
+            "bump-patch-for-minor-pre-major": false
         },
         "packages/js": {
             "release-type": "node",
@@ -30,7 +30,7 @@
             "initial-version": "0.1.0",
             "changelog-path": "CHANGELOG.md",
             "bump-minor-pre-major": true,
-            "bump-patch-for-minor-pre-major": true
+            "bump-patch-for-minor-pre-major": false
         }
     },
     "separate-pull-requests": true

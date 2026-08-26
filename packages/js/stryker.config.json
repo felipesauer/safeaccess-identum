@@ -1,6 +1,8 @@
 {
     "testRunner": "vitest",
     "tsconfigFile": "tsconfig.stryker-none.json",
+    "coverageAnalysis": "perTest",
+    "timeoutMS": 30000,
     "mutate": [
         "src/**/*.ts",
         "!src/**/*.test.ts",
@@ -9,19 +11,19 @@
         "!src/exceptions/**/*.ts"
     ],
     "thresholds": {
-        "high": 85,
+        "high": 95,
         "low": 85,
         "break": 85
     },
-    "timeoutMS": 15000,
-    "concurrency": 4,
     "incremental": true,
-    "incrementalFile": "reports/stryker/.incremental.json",
-    "reporters": ["json", "progress", "dashboard"],
+    "incrementalFile": "reports/mutation/.incremental.json",
+    "reporters": ["json", "clear-text", "progress", "dashboard"],
     "jsonReporter": {
-        "fileName": "reports/stryker/mutation.json"
+        "fileName": "reports/mutation/mutation.json"
     },
     "dashboard": {
+        "project": "github.com/felipesauer/safeaccess-identum",
+        "version": "main",
         "reportType": "full"
     }
 }
