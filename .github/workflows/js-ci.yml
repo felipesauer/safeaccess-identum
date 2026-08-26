@@ -67,11 +67,11 @@ jobs:
               if: matrix.node == '24'
               run: npm run lint
 
-            # Mutation testing publishes to the Stryker Dashboard (powers the README badge).
-            # Runs only on push to main so the dashboard's `main` report — which the badge
-            # reads — stays authoritative; PRs skip it to avoid noise and extra runtime.
+            # Mutation testing also gates pull requests, so a drop in MSI is caught
+            # before it reaches main. Only the push-to-main run publishes to the
+            # Stryker Dashboard — that report is what the README badge reads.
             - name: Mutation tests (MSI = 85%)
-              if: matrix.node == '24' && github.event_name == 'push'
+              if: matrix.node == '24'
               run: npm run test:mutation
               env:
                   STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
