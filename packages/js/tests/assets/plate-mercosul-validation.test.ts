@@ -37,4 +37,32 @@ describe(PlateMercosulValidation.name, () => {
     it('rejects empty string', () => {
         expect(new PlateMercosulValidation('').isValid()).toBe(false);
     });
+
+    it('distinguishes wrong_length from invalid_format', () => {
+        expect(new PlateMercosulValidation('BRA1A2').validate().reason).toBe('wrong_length');
+        expect(new PlateMercosulValidation('BRA1A234').validate().reason).toBe('wrong_length');
+        expect(new PlateMercosulValidation('ABC1234').validate().reason).toBe('invalid_format');
+        expect(new PlateMercosulValidation('1234567').validate().reason).toBe('invalid_format');
+    });
+
+    it('prefixes the thrown reason with the document name', () => {
+        expect(() => new PlateMercosulValidation('ABC1234').validateOrFail()).toThrow('plate: invalid_format');
+    });
+
+    it('exposes the layout via meta.pattern', () => {
+        expect(new PlateMercosulValidation('BRA1A23').validate().meta?.pattern).toBe('mercosul');
+    });
+
+    it('trims surrounding whitespace before validating', () => {
+        expect(new PlateMercosulValidation('   BRA1A23   ').isValid()).toBe(true);
+        expect(new PlateMercosulValidation('\tBRA1A23\n').strip()).toBe('BRA1A23');
+    });
+
+    it('generate() produces the LLLNLNN layout', () => {
+        for (let i = 0; i < 50; i++) {
+            const plate = PlateMercosulValidation.generate();
+            expect(plate).toMatch(/^[A-Z]{3}[0-9][A-Z][0-9]{2}$/);
+            expect(new PlateMercosulValidation(plate).isValid()).toBe(true);
+        }
+    });
 });

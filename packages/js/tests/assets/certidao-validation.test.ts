@@ -32,4 +32,42 @@ describe(CertidaoValidation.name, () => {
             'certidao: bad_check_digit',
         );
     });
+
+    it('rejects a wrong D1 even when D2 is consistent with it', () => {
+        // D1 is 7 where 6 is expected; D2 was recomputed over the corrupted D1.
+        expect(new CertidaoValidation('00188301551987100018050000056673').validate().reason).toBe(
+            'bad_check_digit',
+        );
+    });
+
+    it('rejects a wrong D2 when D1 is correct', () => {
+        expect(new CertidaoValidation('00188301551987100018050000056666').validate().reason).toBe(
+            'bad_check_digit',
+        );
+    });
+
+    it('maps a Mod-11 remainder of 10 to a check digit of 1', () => {
+        // D1 raw remainder is 10, so the expected digit is 1.
+        expect(new CertidaoValidation('00000101551987100018050000056615').isValid()).toBe(true);
+        // Same for D2.
+        expect(new CertidaoValidation('00000501551987100018050000056651').isValid()).toBe(true);
+    });
+
+    it('maps every book-type digit to its certificate kind', () => {
+        const kinds: Array<[string, string | null]> = [
+            ['00188301551987100018050000056665', 'birth'],
+            ['00188301551987200018050000056601', 'marriage'],
+            ['00188301551987300018050000056654', 'marriage'],
+            ['00188301551987400018050000056615', 'death'],
+            ['00188301551987500018050000056643', 'stillbirth'],
+            ['00188301551987700018050000056632', 'other'],
+            ['00188301551987600018050000056698', null], // unmapped book type
+        ];
+
+        for (const [matricula, kind] of kinds) {
+            const result = new CertidaoValidation(matricula).validate();
+            expect(result.valid).toBe(true);
+            expect(result.meta?.type).toBe(kind);
+        }
+    });
 });

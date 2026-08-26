@@ -53,5 +53,8 @@ describe('Identum generators produce valid documents', () => {
     it('generates unmasked by default', () => {
         expect(Identum.generateCpf()).toMatch(/^\d{11}$/);
         expect(Identum.generateCnpj()).toMatch(/^\d{14}$/);
+        expect(Identum.generateCep()).toMatch(/^\d{8}$/);
+        expect(Identum.generateCns()).toMatch(/^\d{15}$/);
+        expect(Identum.generatePis()).toMatch(/^\d{11}$/);
     });
 });

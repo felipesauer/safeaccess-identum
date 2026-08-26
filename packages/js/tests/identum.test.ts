@@ -11,6 +11,9 @@ import { CEPValidation } from '../src/assets/cep/cep-validation.js';
 import { IEValidation } from '../src/assets/ie/ie-validation.js';
 import { PlateMercosulValidation } from '../src/assets/plate/plate-mercosul-validation.js';
 import { VoterTitleValidation } from '../src/assets/voter/voter-title-validation.js';
+import { CartaoValidation } from '../src/assets/cartao/cartao-validation.js';
+import { CertidaoValidation } from '../src/assets/certidao/certidao-validation.js';
+import { PixValidation } from '../src/assets/pix/pix-validation.js';
 import { StateEnum } from '../src/assets/ie/state-enum.js';
 
 describe(Identum.name, () => {
@@ -77,6 +80,24 @@ describe(Identum.name, () => {
     it('resolves tituloEleitor via static alias', () => {
         const v = Identum.tituloEleitor('123456781295');
         expect(v).toBeInstanceOf(VoterTitleValidation);
+        expect(v.isValid()).toBe(true);
+    });
+
+    it('resolves cartao via static alias', () => {
+        const v = Identum.cartao('4111111111111111');
+        expect(v).toBeInstanceOf(CartaoValidation);
+        expect(v.isValid()).toBe(true);
+    });
+
+    it('resolves certidao via static alias', () => {
+        const v = Identum.certidao('00188301551987100018050000056665');
+        expect(v).toBeInstanceOf(CertidaoValidation);
+        expect(v.isValid()).toBe(true);
+    });
+
+    it('resolves pix via static alias', () => {
+        const v = Identum.pix('pix@bcb.gov.br');
+        expect(v).toBeInstanceOf(PixValidation);
         expect(v.isValid()).toBe(true);
     });
 
