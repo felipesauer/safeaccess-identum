@@ -8,7 +8,7 @@ TypeScript/JavaScript library for validating Brazilian documents — CPF, CNPJ, 
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@safeaccess/identum"><img src="https://img.shields.io/npm/v/@safeaccess/identum?label=npm" alt="npm"></a>
-  <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
   <img src="https://img.shields.io/badge/Node.js-22%2B-339933?logo=nodedotjs&amp;logoColor=white" alt="Node.js 22+">
   <img src="https://img.shields.io/badge/ESM-native-F7DF1E?logo=javascript&amp;logoColor=black" alt="ESM native">
   <img src="https://img.shields.io/badge/Tested%20with-Vitest-6E9F18" alt="Tested with Vitest">
@@ -209,4 +209,4 @@ See [CONTRIBUTING.md](../../CONTRIBUTING.md) for development setup, commit conve
 
 ## License
 
-[MIT](../../LICENSE) © Felipe Sauer
+[MIT](LICENSE) © Felipe Sauer
