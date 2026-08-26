@@ -8,7 +8,7 @@ PHP library for validating Brazilian documents — CPF, CNPJ, CNH, CEP, CNS, PIS
 
 <p align="center">
   <a href="https://packagist.org/packages/safeaccess/identum"><img src="https://img.shields.io/packagist/v/safeaccess/identum?label=packagist" alt="Packagist"></a>
-  <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
   <img src="https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php&amp;logoColor=white" alt="PHP 8.2+">
   <img src="https://img.shields.io/badge/PHPStan-max-0A6DAD" alt="PHPStan max">
   <img src="https://img.shields.io/badge/Tested%20with-Pest-FF5733" alt="Tested with Pest">
@@ -197,4 +197,4 @@ See [CONTRIBUTING.md](../../CONTRIBUTING.md) for development setup, commit conve
 
 ## License
 
-[MIT](../../LICENSE) © Felipe Sauer
+[MIT](LICENSE) © Felipe Sauer
