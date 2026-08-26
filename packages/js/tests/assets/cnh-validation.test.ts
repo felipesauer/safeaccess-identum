@@ -36,8 +36,12 @@ describe(CNHValidation.name, () => {
 
     it('validateOrFail returns true for valid and throws for invalid', () => {
         expect(new CNHValidation('12345678900').validateOrFail()).toBeUndefined();
-        expect(() => new CNHValidation('92079525000').validateOrFail()).toThrow(ValidationException);
-        expect(() => new CNHValidation('92079525000').validateOrFail()).toThrow('cnh: bad_check_digit');
+        expect(() => new CNHValidation('92079525000').validateOrFail()).toThrow(
+            ValidationException,
+        );
+        expect(() => new CNHValidation('92079525000').validateOrFail()).toThrow(
+            'cnh: bad_check_digit',
+        );
     });
 
     it('hits the dv2 adjustment branch (dv1=10→0 and dv2-2<0 → +9)', () => {

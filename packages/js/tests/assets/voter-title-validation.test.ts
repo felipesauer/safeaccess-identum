@@ -23,7 +23,9 @@ describe(VoterTitleValidation.name, () => {
     });
 
     it('whitelist short-circuits to valid and blacklist to invalid', () => {
-        expect(new VoterTitleValidation('123456781294').allowList(['123456781294']).validateOrFail()).toBeUndefined();
+        expect(
+            new VoterTitleValidation('123456781294').allowList(['123456781294']).validateOrFail(),
+        ).toBeUndefined();
 
         const bl = new VoterTitleValidation('123456781295').denyList(['123456781295']);
         expect(bl.isValid()).toBe(false);

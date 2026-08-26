@@ -67,16 +67,23 @@ describe(CNPJValidation.name, () => {
     });
 
     it('validateOrFail() throws when invalid', () => {
-        expect(() => new CNPJValidation('09387424300012').validateOrFail())
-            .toThrow(ValidationException);
-        expect(() => new CNPJValidation('09387424300012').validateOrFail())
-            .toThrow('cnpj: bad_check_digit');
+        expect(() => new CNPJValidation('09387424300012').validateOrFail()).toThrow(
+            ValidationException,
+        );
+        expect(() => new CNPJValidation('09387424300012').validateOrFail()).toThrow(
+            'cnpj: bad_check_digit',
+        );
     });
 
     it('validateOrFail() respects whitelist and blacklist', () => {
-        expect(new CNPJValidation('09387424300012').allowList(['09387424300012']).validateOrFail()).toBeUndefined();
-        expect(() => new CNPJValidation('84.773.274/0001-03').denyList(['84.773.274/0001-03']).validateOrFail())
-            .toThrow(ValidationException);
+        expect(
+            new CNPJValidation('09387424300012').allowList(['09387424300012']).validateOrFail(),
+        ).toBeUndefined();
+        expect(() =>
+            new CNPJValidation('84.773.274/0001-03')
+                .denyList(['84.773.274/0001-03'])
+                .validateOrFail(),
+        ).toThrow(ValidationException);
     });
 
     it('rejects alphanumeric CNPJ with invalid character in the body', () => {

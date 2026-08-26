@@ -131,7 +131,11 @@ export abstract class AbstractValidatableDocument implements ValidatableDocument
         const result = this.validate();
 
         if (!result.valid) {
-            throw new ValidationException(this.documentName(), result.reason as ReasonCode, result.normalized);
+            throw new ValidationException(
+                this.documentName(),
+                result.reason as ReasonCode,
+                result.normalized,
+            );
         }
     }
 

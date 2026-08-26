@@ -11,7 +11,10 @@ export class MtRule extends AbstractStateRule {
         const d = this.digits(ie);
         if (d.length !== 11 || this.allSameDigits(d)) return false;
 
-        const dv = this.dvMod11Ge10Eq0(this.toIntArray(d.slice(0, 10)), [3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+        const dv = this.dvMod11Ge10Eq0(
+            this.toIntArray(d.slice(0, 10)),
+            [3, 2, 9, 8, 7, 6, 5, 4, 3, 2],
+        );
         return Number(d[10]) === dv;
     }
 

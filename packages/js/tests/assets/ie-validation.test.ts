@@ -676,11 +676,15 @@ describe(IEValidation.name, () => {
 
     describe('whitelist / blacklist / validateOrFail', () => {
         it('whitelist() overrides invalid result', () => {
-            expect(new IEValidation('209644418', StateEnum.GO).allowList(['209644418']).isValid()).toBe(true);
+            expect(
+                new IEValidation('209644418', StateEnum.GO).allowList(['209644418']).isValid(),
+            ).toBe(true);
         });
 
         it('blacklist() overrides valid result', () => {
-            expect(new IEValidation('209644419', StateEnum.GO).denyList(['209644419']).isValid()).toBe(false);
+            expect(
+                new IEValidation('209644419', StateEnum.GO).denyList(['209644419']).isValid(),
+            ).toBe(false);
         });
 
         it('validateOrFail() returns true when valid', () => {
@@ -688,13 +692,25 @@ describe(IEValidation.name, () => {
         });
 
         it('validateOrFail() throws ValidationException when invalid', () => {
-            expect(() => new IEValidation('209644418', StateEnum.GO).validateOrFail()).toThrow(ValidationException);
-            expect(() => new IEValidation('209644418', StateEnum.GO).validateOrFail()).toThrow('ie: bad_check_digit');
+            expect(() => new IEValidation('209644418', StateEnum.GO).validateOrFail()).toThrow(
+                ValidationException,
+            );
+            expect(() => new IEValidation('209644418', StateEnum.GO).validateOrFail()).toThrow(
+                'ie: bad_check_digit',
+            );
         });
 
         it('validateOrFail() respects whitelist and blacklist', () => {
-            expect(new IEValidation('209644418', StateEnum.GO).allowList(['209644418']).validateOrFail()).toBeUndefined();
-            expect(() => new IEValidation('209644419', StateEnum.GO).denyList(['209644419']).validateOrFail()).toThrow(ValidationException);
+            expect(
+                new IEValidation('209644418', StateEnum.GO)
+                    .allowList(['209644418'])
+                    .validateOrFail(),
+            ).toBeUndefined();
+            expect(() =>
+                new IEValidation('209644419', StateEnum.GO)
+                    .denyList(['209644419'])
+                    .validateOrFail(),
+            ).toThrow(ValidationException);
         });
     });
 });

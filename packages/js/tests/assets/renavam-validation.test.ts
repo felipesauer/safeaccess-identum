@@ -30,7 +30,9 @@ describe(RenavamValidation.name, () => {
     });
 
     it('supports whitelist and blacklist with validateOrFail', () => {
-        expect(new RenavamValidation('12345678901').allowList(['12345678901']).validateOrFail()).toBeUndefined();
+        expect(
+            new RenavamValidation('12345678901').allowList(['12345678901']).validateOrFail(),
+        ).toBeUndefined();
 
         const bl = new RenavamValidation('60390908553').denyList(['60390908553']);
         expect(bl.isValid()).toBe(false);

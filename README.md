@@ -71,10 +71,10 @@ The same API in TypeScript, identical output for identical input.
 
 ## Packages
 
-| Package                                | Language         | Install                                |
-| -------------------------------------- | ---------------- | -------------------------------------- |
-| [`safeaccess/identum`](packages/php/)  | PHP 8.2+         | `composer require safeaccess/identum`  |
-| [`@safeaccess/identum`](packages/js/)  | TypeScript (ESM) | `npm install @safeaccess/identum`      |
+| Package                               | Language         | Install                               |
+| ------------------------------------- | ---------------- | ------------------------------------- |
+| [`safeaccess/identum`](packages/php/) | PHP 8.2+         | `composer require safeaccess/identum` |
+| [`@safeaccess/identum`](packages/js/) | TypeScript (ESM) | `npm install @safeaccess/identum`     |
 
 Both packages expose the same public API surface and are tested for behavioral parity.
 
@@ -160,70 +160,70 @@ Identum::generateCnpj(formatted: true);     // e.g. '12.345.678/0001-95'
 import { Identum, StateEnum, ValidationException } from '@safeaccess/identum';
 
 // Boolean shortcut — the quickest check
-Identum.cpf('529.982.247-25').isValid();                    // true
-Identum.cnpj('84.773.274/0001-03').isValid();               // true
-Identum.cnpj('A0000000000032').isValid();                   // true — alphanumeric CNPJ
-Identum.cnh('22522791508').isValid();                       // true
-Identum.cep('78000-000').isValid();                         // true
-Identum.cns('100000000060018').isValid();                   // true
-Identum.pis('329.9506.158-9').isValid();                    // true
-Identum.ie('343173196450', StateEnum.SP).isValid();         // true — all 27 states
-Identum.renavam('60390908553').isValid();                   // true
-Identum.placa('ABC1D23').isValid();                         // true — Mercosul format
-Identum.tituloEleitor('123456781295').isValid();            // true
-Identum.cartao('4111111111111111').isValid();               // true — Luhn
-Identum.pix('pix@bcb.gov.br').isValid();                    // true — PIX key
+Identum.cpf('529.982.247-25').isValid(); // true
+Identum.cnpj('84.773.274/0001-03').isValid(); // true
+Identum.cnpj('A0000000000032').isValid(); // true — alphanumeric CNPJ
+Identum.cnh('22522791508').isValid(); // true
+Identum.cep('78000-000').isValid(); // true
+Identum.cns('100000000060018').isValid(); // true
+Identum.pis('329.9506.158-9').isValid(); // true
+Identum.ie('343173196450', StateEnum.SP).isValid(); // true — all 27 states
+Identum.renavam('60390908553').isValid(); // true
+Identum.placa('ABC1D23').isValid(); // true — Mercosul format
+Identum.tituloEleitor('123456781295').isValid(); // true
+Identum.cartao('4111111111111111').isValid(); // true — Luhn
+Identum.pix('pix@bcb.gov.br').isValid(); // true — PIX key
 Identum.certidao('00188301551987100018050000056665').isValid(); // true — certificate
 
 // Rich result — why it failed, the normalized value, and extracted metadata
 const result = Identum.cpf('529.982.247-25').validate();
-result.valid;       // true
-result.reason;      // null (a ReasonCode when invalid)
-result.normalized;  // '52998224725'
-result.meta?.uf;    // 'SP' — fiscal region
+result.valid; // true
+result.reason; // null (a ReasonCode when invalid)
+result.normalized; // '52998224725'
+result.meta?.uf; // 'SP' — fiscal region
 
 const bad = Identum.cpf('529.982.247-24').validate();
-bad.valid;          // false
-bad.reason;         // 'bad_check_digit'
+bad.valid; // false
+bad.reason; // 'bad_check_digit'
 
 // Validate or throw — the exception carries structured context
 try {
     Identum.cpf('000.000.000-00').validateOrFail();
 } catch (e) {
     if (e instanceof ValidationException) {
-        e.document;   // 'cpf'
-        e.reason;     // 'known_invalid'
+        e.document; // 'cpf'
+        e.reason; // 'known_invalid'
         e.normalized; // '00000000000'
     }
 }
 
 // Allow list / deny list (format-agnostic: input and list entries are sanitized before matching)
-Identum.cpf('529.982.247-25').denyList(['52998224725']).isValid();   // false — matches despite the mask
+Identum.cpf('529.982.247-25').denyList(['52998224725']).isValid(); // false — matches despite the mask
 Identum.cpf('000.000.000-00').allowList(['000.000.000-00']).isValid(); // true
 
 // Format / strip
-Identum.cpf('52998224725').format();     // '529.982.247-25'
-Identum.cpf('529.982.247-25').strip();   // '52998224725'
+Identum.cpf('52998224725').format(); // '529.982.247-25'
+Identum.cpf('529.982.247-25').strip(); // '52998224725'
 
 // Generate valid documents for tests
-Identum.generateCpf();                    // e.g. '76502099010'
-Identum.generateCnpj(true);               // e.g. '12.345.678/0001-95'
+Identum.generateCpf(); // e.g. '76502099010'
+Identum.generateCnpj(true); // e.g. '12.345.678/0001-95'
 ```
 
 ## API
 
 All validator classes share the same fluent interface after construction:
 
-| Method | PHP return | TS return | Description |
-| --- | --- | --- | --- |
-| `validate()` | `ValidationResult` | `ValidationResult` | Rich result: `{ valid, reason, normalized, meta }` |
-| `isValid()` | `bool` | `boolean` | Boolean shortcut for `validate().valid` |
-| `validateOrFail()` | `void` | `void` | Throws `ValidationException` (carrying `document`, `reason`, `normalized`) when invalid |
-| `format()` | `string` | `string` | Canonical mask applied, best-effort (returns the stripped value if it doesn't fit) |
-| `strip()` | `string` | `string` | Canonical value with every mask character removed |
-| `denyList(string[])` | `static` | `this` | Force-reject the given values regardless of checksum |
-| `allowList(string[])` | `static` | `this` | Force-accept the given values regardless of checksum |
-| `raw()` | `string` | `string` | The input exactly as provided |
+| Method                | PHP return         | TS return          | Description                                                                             |
+| --------------------- | ------------------ | ------------------ | --------------------------------------------------------------------------------------- |
+| `validate()`          | `ValidationResult` | `ValidationResult` | Rich result: `{ valid, reason, normalized, meta }`                                      |
+| `isValid()`           | `bool`             | `boolean`          | Boolean shortcut for `validate().valid`                                                 |
+| `validateOrFail()`    | `void`             | `void`             | Throws `ValidationException` (carrying `document`, `reason`, `normalized`) when invalid |
+| `format()`            | `string`           | `string`           | Canonical mask applied, best-effort (returns the stripped value if it doesn't fit)      |
+| `strip()`             | `string`           | `string`           | Canonical value with every mask character removed                                       |
+| `denyList(string[])`  | `static`           | `this`             | Force-reject the given values regardless of checksum                                    |
+| `allowList(string[])` | `static`           | `this`             | Force-accept the given values regardless of checksum                                    |
+| `raw()`               | `string`           | `string`           | The input exactly as provided                                                           |
 
 `denyList()` and `allowList()` are fluent and can be chained before `validate()`. Matching is **format-agnostic** — both the input and the list entries are passed through the same sanitization the validator uses, so `'529.982.247-25'` matches a list entry of `'52998224725'`. When a value appears in both lists, **allow list wins**.
 
@@ -246,21 +246,21 @@ validate() → {
 
 ## Supported documents
 
-| Document        | Alias            | PHP Class                  | TS Class                  |
-| --------------- | ---------------- | -------------------------- | ------------------------- |
-| CPF             | `cpf`            | `CPFValidation`            | `CPFValidation`           |
-| CNPJ            | `cnpj`           | `CNPJValidation`           | `CNPJValidation`          |
-| CNH             | `cnh`            | `CNHValidation`            | `CNHValidation`           |
-| CEP             | `cep`            | `CEPValidation`            | `CEPValidation`           |
-| CNS             | `cns`            | `CNSValidation`            | `CNSValidation`           |
-| PIS/PASEP       | `pis`            | `PISValidation`            | `PISValidation`           |
-| IE              | `ie`             | `IEValidation`             | `IEValidation`            |
-| RENAVAM         | `renavam`        | `RenavamValidation`        | `RenavamValidation`       |
-| Mercosul Plate  | `placa`          | `PlateMercosulValidation`  | `PlateMercosulValidation` |
-| Voter Title     | `tituloEleitor`  | `VoterTitleValidation`     | `VoterTitleValidation`    |
-| Payment Card    | `cartao`         | `CartaoValidation`         | `CartaoValidation`        |
-| PIX key         | `pix`            | `PixValidation`            | `PixValidation`           |
-| Certificate     | `certidao`       | `CertidaoValidation`       | `CertidaoValidation`      |
+| Document       | Alias           | PHP Class                 | TS Class                  |
+| -------------- | --------------- | ------------------------- | ------------------------- |
+| CPF            | `cpf`           | `CPFValidation`           | `CPFValidation`           |
+| CNPJ           | `cnpj`          | `CNPJValidation`          | `CNPJValidation`          |
+| CNH            | `cnh`           | `CNHValidation`           | `CNHValidation`           |
+| CEP            | `cep`           | `CEPValidation`           | `CEPValidation`           |
+| CNS            | `cns`           | `CNSValidation`           | `CNSValidation`           |
+| PIS/PASEP      | `pis`           | `PISValidation`           | `PISValidation`           |
+| IE             | `ie`            | `IEValidation`            | `IEValidation`            |
+| RENAVAM        | `renavam`       | `RenavamValidation`       | `RenavamValidation`       |
+| Mercosul Plate | `placa`         | `PlateMercosulValidation` | `PlateMercosulValidation` |
+| Voter Title    | `tituloEleitor` | `VoterTitleValidation`    | `VoterTitleValidation`    |
+| Payment Card   | `cartao`        | `CartaoValidation`        | `CartaoValidation`        |
+| PIX key        | `pix`           | `PixValidation`           | `PixValidation`           |
+| Certificate    | `certidao`      | `CertidaoValidation`      | `CertidaoValidation`      |
 
 ### IE — all 27 states
 
@@ -275,7 +275,7 @@ Identum::ie('P199163724045', StateEnum::SP)->isValid(); // true — rural (P pre
 ```typescript
 import { Identum, StateEnum } from '@safeaccess/identum';
 
-Identum.ie('153189458', StateEnum.BA).isValid();     // true
+Identum.ie('153189458', StateEnum.BA).isValid(); // true
 Identum.ie('7908930932562', StateEnum.MG).isValid(); // true
 Identum.ie('P199163724045', StateEnum.SP).isValid(); // true
 ```
@@ -310,8 +310,8 @@ Identum::certidao('00188301551987100018050000056665')->validate()->meta?->type; 
 ```
 
 ```typescript
-Identum.cartao('4111111111111111').validate().meta?.brand;      // 'visa'
-Identum.pix('+5510998765432').validate().meta?.keyType;         // 'phone'
+Identum.cartao('4111111111111111').validate().meta?.brand; // 'visa'
+Identum.pix('+5510998765432').validate().meta?.keyType; // 'phone'
 Identum.certidao('00188301551987100018050000056665').validate().meta?.type; // 'birth'
 ```
 
@@ -349,14 +349,14 @@ Every document has a subpath (`/cpf`, `/cnpj`, `/ie`, `/cartao`, `/pix`, `/certi
 
 Version 2.0 reshapes the API and adds capabilities and document types. Both packages change in lockstep, so the same steps apply to PHP and TypeScript. Checksums, sanitization, and all 1.x documents are unchanged — a value valid in 1.x is still valid in 2.0.
 
-| 1.x | 2.0 | Why |
-| --- | --- | --- |
-| `validate(): bool` | `validate(): ValidationResult` — use `isValid()` for a boolean | Rich result: reason, normalized value, metadata |
-| `validateOrFail(): true` | `validateOrFail(): void`; exception carries `document` / `reason` / `normalized` | Structured errors |
-| `blacklist()` / `whitelist()` | `denyList()` / `allowList()` (old names deprecated, removed in 3.0) | Clearer terminology |
-| exception message `"cpf: input invalid"` | `"cpf: <reason>"` (e.g. `"cpf: bad_check_digit"`) | Message reflects the machine-readable reason |
-| PHP `Identum::alias()` / `getAlias()` | removed — use the concrete static factories | Facade simplified, mirrors the JS one |
-| PHP `CPFValidation::make(...)` | `new CPFValidation(...)` | The `make()` trait was removed |
+| 1.x                                      | 2.0                                                                              | Why                                             |
+| ---------------------------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `validate(): bool`                       | `validate(): ValidationResult` — use `isValid()` for a boolean                   | Rich result: reason, normalized value, metadata |
+| `validateOrFail(): true`                 | `validateOrFail(): void`; exception carries `document` / `reason` / `normalized` | Structured errors                               |
+| `blacklist()` / `whitelist()`            | `denyList()` / `allowList()` (old names deprecated, removed in 3.0)              | Clearer terminology                             |
+| exception message `"cpf: input invalid"` | `"cpf: <reason>"` (e.g. `"cpf: bad_check_digit"`)                                | Message reflects the machine-readable reason    |
+| PHP `Identum::alias()` / `getAlias()`    | removed — use the concrete static factories                                      | Facade simplified, mirrors the JS one           |
+| PHP `CPFValidation::make(...)`           | `new CPFValidation(...)`                                                         | The `make()` trait was removed                  |
 
 **The one change that touches most codebases:** `validate()` now returns an object, which is **always truthy**. Replace `validate()` used as a boolean with `isValid()`:
 
@@ -364,6 +364,7 @@ Version 2.0 reshapes the API and adds capabilities and document types. Both pack
 - if (Identum::cpf($doc)->validate()) { /* ... */ }   // ⚠️ always truthy in 2.0
 + if (Identum::cpf($doc)->isValid())  { /* ... */ }
 ```
+
 ```diff
 - if (Identum.cpf(doc).validate()) { /* ... */ }       // ⚠️ always truthy in 2.0
 + if (Identum.cpf(doc).isValid())  { /* ... */ }

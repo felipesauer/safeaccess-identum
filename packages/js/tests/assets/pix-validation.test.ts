@@ -40,7 +40,9 @@ describe(PixValidation.name, () => {
 
     it('rejects an e-mail longer than the 77-char DICT limit', () => {
         expect(new PixValidation('a'.repeat(70) + '@x.com').isValid()).toBe(true); // 76
-        expect(new PixValidation('a'.repeat(72) + '@x.com').validate().reason).toBe('invalid_format'); // 78
+        expect(new PixValidation('a'.repeat(72) + '@x.com').validate().reason).toBe(
+            'invalid_format',
+        ); // 78
     });
 
     it('accepts E.164 up to 15 digits and rejects 16 (phone key)', () => {

@@ -18,7 +18,10 @@ export class DfRule extends AbstractStateRule {
         if (Number(d[11]) !== dv1) return false;
 
         const base12 = base11 + String(dv1);
-        const dv2 = this.dvMod11Lt2Eq0(this.toIntArray(base12), [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+        const dv2 = this.dvMod11Lt2Eq0(
+            this.toIntArray(base12),
+            [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2],
+        );
         return Number(d[12]) === dv2;
     }
 

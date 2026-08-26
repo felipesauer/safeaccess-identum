@@ -87,7 +87,9 @@ describe(CPFValidation.name, () => {
     });
 
     it('whitelist() overrides invalid result', () => {
-        expect(new CPFValidation('323.543.123-43').allowList(['323.543.123-43']).isValid()).toBe(true);
+        expect(new CPFValidation('323.543.123-43').allowList(['323.543.123-43']).isValid()).toBe(
+            true,
+        );
     });
 
     it('whitelist()/blacklist() match regardless of formatting (both sides sanitized)', () => {
@@ -98,7 +100,9 @@ describe(CPFValidation.name, () => {
     });
 
     it('blacklist() overrides valid result', () => {
-        expect(new CPFValidation('864.600.120-24').denyList(['864.600.120-24']).isValid()).toBe(false);
+        expect(new CPFValidation('864.600.120-24').denyList(['864.600.120-24']).isValid()).toBe(
+            false,
+        );
     });
 
     it('validateOrFail() returns true when valid', () => {
@@ -106,18 +110,30 @@ describe(CPFValidation.name, () => {
     });
 
     it('validateOrFail() throws ValidationException when invalid', () => {
-        expect(() => new CPFValidation('323.543.123-43').validateOrFail()).toThrow(ValidationException);
-        expect(() => new CPFValidation('323.543.123-43').validateOrFail()).toThrow('cpf: bad_check_digit');
+        expect(() => new CPFValidation('323.543.123-43').validateOrFail()).toThrow(
+            ValidationException,
+        );
+        expect(() => new CPFValidation('323.543.123-43').validateOrFail()).toThrow(
+            'cpf: bad_check_digit',
+        );
     });
 
     it('validateOrFail() respects allowList and denyList', () => {
-        expect(new CPFValidation('323.543.123-43').allowList(['323.543.123-43']).validateOrFail()).toBeUndefined();
-        expect(() => new CPFValidation('864.600.120-24').denyList(['864.600.120-24']).validateOrFail()).toThrow(ValidationException);
+        expect(
+            new CPFValidation('323.543.123-43').allowList(['323.543.123-43']).validateOrFail(),
+        ).toBeUndefined();
+        expect(() =>
+            new CPFValidation('864.600.120-24').denyList(['864.600.120-24']).validateOrFail(),
+        ).toThrow(ValidationException);
     });
 
     it('deprecated whitelist()/blacklist() still work as aliases', () => {
-        expect(new CPFValidation('323.543.123-43').whitelist(['323.543.123-43']).isValid()).toBe(true);
-        expect(new CPFValidation('864.600.120-24').blacklist(['864.600.120-24']).isValid()).toBe(false);
+        expect(new CPFValidation('323.543.123-43').whitelist(['323.543.123-43']).isValid()).toBe(
+            true,
+        );
+        expect(new CPFValidation('864.600.120-24').blacklist(['864.600.120-24']).isValid()).toBe(
+            false,
+        );
     });
 
     it('validate() returns a rich result (valid: normalized + fiscal-region meta)', () => {
@@ -152,7 +168,9 @@ describe(CPFValidation.name, () => {
         expect(new CPFValidation('9999999999').validate().reason).toBe('wrong_length');
         expect(new CPFValidation('00000000000').validate().reason).toBe('known_invalid');
         expect(new CPFValidation('323.543.123-43').validate().reason).toBe('bad_check_digit');
-        expect(new CPFValidation('864.600.120-24').denyList(['86460012024']).validate().reason).toBe('denied');
+        expect(
+            new CPFValidation('864.600.120-24').denyList(['86460012024']).validate().reason,
+        ).toBe('denied');
     });
 
     it('validateOrFail() throws with structured context', () => {

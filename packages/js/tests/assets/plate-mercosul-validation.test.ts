@@ -46,7 +46,9 @@ describe(PlateMercosulValidation.name, () => {
     });
 
     it('prefixes the thrown reason with the document name', () => {
-        expect(() => new PlateMercosulValidation('ABC1234').validateOrFail()).toThrow('plate: invalid_format');
+        expect(() => new PlateMercosulValidation('ABC1234').validateOrFail()).toThrow(
+            'plate: invalid_format',
+        );
     });
 
     it('exposes the layout via meta.pattern', () => {

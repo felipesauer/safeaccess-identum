@@ -58,7 +58,11 @@
     "certidao": [
         { "input": "00188301551987100018050000056665", "valid": true },
         { "input": "001883 01 55 1987 1 00018 050 0000566 65", "valid": true },
-        { "input": "00188301551987100018050000056600", "valid": false, "reason": "bad_check_digit" },
+        {
+            "input": "00188301551987100018050000056600",
+            "valid": false,
+            "reason": "bad_check_digit"
+        },
         { "input": "123", "valid": false, "reason": "wrong_length" }
     ],
     "cartao": [

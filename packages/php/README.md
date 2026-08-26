@@ -125,16 +125,16 @@ $validator->isValid(); // true
 
 All validator classes share the same fluent interface after construction:
 
-| Method | Return | Description |
-| --- | --- | --- |
-| `validate()` | `ValidationResult` | Rich result: `{ valid, reason, normalized, meta }` |
-| `isValid()` | `bool` | Boolean shortcut for `validate()->valid` |
-| `validateOrFail()` | `void` | Throws `ValidationException` (with `document`, `reason`, `normalized`) when invalid |
-| `format()` | `string` | Canonical mask applied, best-effort |
-| `strip()` | `string` | Canonical value with mask characters removed |
-| `denyList(string[])` | `static` | Force-reject the specified values regardless of checksum |
-| `allowList(string[])` | `static` | Force-accept the specified values regardless of checksum |
-| `raw()` | `string` | The input exactly as provided |
+| Method                | Return             | Description                                                                         |
+| --------------------- | ------------------ | ----------------------------------------------------------------------------------- |
+| `validate()`          | `ValidationResult` | Rich result: `{ valid, reason, normalized, meta }`                                  |
+| `isValid()`           | `bool`             | Boolean shortcut for `validate()->valid`                                            |
+| `validateOrFail()`    | `void`             | Throws `ValidationException` (with `document`, `reason`, `normalized`) when invalid |
+| `format()`            | `string`           | Canonical mask applied, best-effort                                                 |
+| `strip()`             | `string`           | Canonical value with mask characters removed                                        |
+| `denyList(string[])`  | `static`           | Force-reject the specified values regardless of checksum                            |
+| `allowList(string[])` | `static`           | Force-accept the specified values regardless of checksum                            |
+| `raw()`               | `string`           | The input exactly as provided                                                       |
 
 > `blacklist()` / `whitelist()` still work as deprecated aliases of `denyList()` / `allowList()` and will be removed in 3.0.
 
