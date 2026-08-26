@@ -10,9 +10,9 @@ PHP library for validating Brazilian documents — CPF, CNPJ, CNH, CEP, CNS, PIS
   <a href="https://packagist.org/packages/safeaccess/identum"><img src="https://img.shields.io/packagist/v/safeaccess/identum?label=packagist" alt="Packagist"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
   <img src="https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php&amp;logoColor=white" alt="PHP 8.2+">
-  <img src="https://img.shields.io/badge/PHPStan-max-0A6DAD" alt="PHPStan max">
+  <img src="https://img.shields.io/badge/PHPStan-level%209-0A6DAD" alt="PHPStan level 9">
   <img src="https://img.shields.io/badge/Tested%20with-Pest-FF5733" alt="Tested with Pest">
-  <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/felipesauer/80c602b17107f88fb17794d4d44c94fa/raw/infection-msi.json" alt="Infection MSI">
+  <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/felipesauer/270e797ff861330a4ac508ab7e9ce2bd/raw/infection-msi.json" alt="Infection MSI">
 </p>
 
 ---
@@ -30,7 +30,7 @@ PHP library for validating Brazilian documents — CPF, CNPJ, CNH, CEP, CNS, PIS
 - **IE all 27 states** — every state algorithm implemented and tested with edge cases
 - **Input sanitization by default** — `'529.982.247-25'` and `'52998224725'` both just work
 - **Allow list / deny list** — force-accept or force-reject specific values (allow list wins)
-- **100% line + branch coverage** — tested with Pest 3 · Infection mutation testing (≥ 85% MSI)
+- **100% line coverage** — tested with Pest 3 · Infection mutation testing (≥ 85% MSI)
 - **Zero production dependencies** — pure PHP 8.2+
 
 ## The problem

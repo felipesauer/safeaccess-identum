@@ -5,14 +5,14 @@ export default defineConfig({
         globals: false,
         coverage: {
             include: ['src/**/*.ts'],
-            exclude: [
-                'src/index.ts',
-            ],
+            exclude: ['src/index.ts'],
             reporter: ['json', 'clover'],
             thresholds: {
                 lines: 100,
-                // One legacy branch in ie/rules/ro-rule.ts is uncovered; raise to 100 once it is.
-                branches: 95,
+                // Short of 100 by a handful of unreachable branches: the `?? null`
+                // guards in cpf/ie extractMeta (their lookup tables are total), and
+                // the `dv >= 10` arms inside generate(), which depend on the RNG.
+                branches: 99,
                 functions: 100,
                 statements: 100,
             },

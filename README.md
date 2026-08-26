@@ -15,7 +15,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
   <img src="https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php&logoColor=white" alt="PHP 8.2+">
   <img src="https://img.shields.io/badge/Node.js-22%2B-339933?logo=nodedotjs&logoColor=white" alt="Node.js 22+">
-  <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/felipesauer/80c602b17107f88fb17794d4d44c94fa/raw/infection-msi.json" alt="PHP Infection MSI">
+  <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/felipesauer/270e797ff861330a4ac508ab7e9ce2bd/raw/infection-msi.json" alt="PHP Infection MSI">
   <img src="https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Ffelipesauer%2Fsafeaccess-identum%2Fmain" alt="JS Stryker MSI">
 </p>
 
@@ -66,7 +66,7 @@ The same API in TypeScript, identical output for identical input.
 - **Input sanitization by default** — `'529.982.247-25'` and `'52998224725'` both just work
 - **Allow list / deny list** — force-accept or force-reject specific values (format-agnostic: both input and list entries are sanitized before matching). Allow list takes precedence over deny list
 - **Tree-shakeable (JS)** — per-document subpath exports (`@safeaccess/identum/cpf`) so you only bundle what you import
-- **100% line & function coverage** (branch coverage enforced at 95%+) — Pest + Infection (PHP) · Vitest + Stryker (TypeScript), mutation MSI ≥ 85%
+- **100% line & function coverage** (branches enforced at 99%+; the remainder are unreachable defensive guards) — Pest + Infection (PHP) · Vitest + Stryker (TypeScript), mutation MSI ≥ 85%
 - **Zero production dependencies**
 
 ## Packages

@@ -80,3 +80,25 @@ jobs:
             - name: Mutation tests (MSI = 85%)
               if: matrix.deps == 'full' && matrix.php == '8.4'
               run: bash scripts/mutation.sh
+
+            - name: Update Infection MSI badge (Gist)
+              if: matrix.deps == 'full' && matrix.php == '8.4' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+              env:
+                  GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+              run: |
+                  if [[ -z "${GIST_TOKEN}" ]]; then
+                    echo "::warning::GIST_TOKEN is not set — leaving the Infection MSI badge untouched."
+                    exit 0
+                  fi
+
+                  MSI=$(python3 -c "import json; print(json.load(open('build/infection/infection.json'))['stats']['msi'])")
+                  if python3 -c "import sys; sys.exit(0 if float('$MSI') >= 90 else 1)"; then COLOR="brightgreen"
+                  elif python3 -c "import sys; sys.exit(0 if float('$MSI') >= 85 else 1)"; then COLOR="green"
+                  elif python3 -c "import sys; sys.exit(0 if float('$MSI') >= 75 else 1)"; then COLOR="yellow"
+                  else COLOR="red"; fi
+
+                  curl -sf -X PATCH \
+                      -H "Authorization: token $GIST_TOKEN" \
+                      -H "Content-Type: application/json" \
+                      -d "{\"files\":{\"infection-msi.json\":{\"content\":\"{\\\"schemaVersion\\\":1,\\\"label\\\":\\\"Infection MSI\\\",\\\"message\\\":\\\"${MSI}%\\\",\\\"color\\\":\\\"${COLOR}\\\"}\"}}}" \
+                      "https://api.github.com/gists/270e797ff861330a4ac508ab7e9ce2bd" > /dev/null

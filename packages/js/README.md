@@ -31,7 +31,7 @@ TypeScript/JavaScript library for validating Brazilian documents — CPF, CNPJ, 
 - **IE all 27 states** — every state algorithm implemented and tested with edge cases
 - **Input sanitization by default** — `'529.982.247-25'` and `'52998224725'` both just work
 - **Allow list / deny list** — force-accept or force-reject specific values (allow list wins)
-- **100% line + branch coverage** — tested with Vitest · Stryker mutation testing (≥ 85% MSI)
+- **100% line coverage, 99%+ branches** — tested with Vitest · Stryker mutation testing (≥ 85% MSI)
 - **Native ESM** — no CommonJS fallback
 - **Zero production dependencies** — pure TypeScript
 
