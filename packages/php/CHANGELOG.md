@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/felipesauer/safeaccess-identum/compare/php-v0.2.0...php-v0.2.1) (2026-08-27)
+
+
+### Bug Fixes
+
+* stop publishing tests and tooling config in the packages ([#82](https://github.com/felipesauer/safeaccess-identum/issues/82)) ([5728ed6](https://github.com/felipesauer/safeaccess-identum/commit/5728ed6db22a4e2650e6613fb5972484e1a9f0d6))
+
 ## [0.2.0](https://github.com/felipesauer/safeaccess-identum/compare/php-v0.1.8...php-v0.2.0) (2026-07-10)
 
 
