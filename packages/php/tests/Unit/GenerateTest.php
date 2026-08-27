@@ -26,8 +26,12 @@ describe('Identum generators produce valid documents', function () {
     ];
 
     foreach ($simple as $label => [$gen, $val]) {
-        it("generates valid {$label} values (50 samples)", function () use ($gen, $val) {
-            for ($i = 0; $i < 50; $i++) {
+        // 300 samples, not 50: several generators have a `remainder === 10 -> 0`
+        // arm that only executes for ~1 in 11 draws. At 50 samples that line went
+        // uncovered on roughly 1 run in 120, failing the --min=100 coverage gate
+        // for reasons unrelated to the change under test.
+        it("generates valid {$label} values (300 samples)", function () use ($gen, $val) {
+            for ($i = 0; $i < 300; $i++) {
                 $value = Identum::$gen();
                 expect(Identum::$val($value)->isValid())->toBeTrue();
             }
