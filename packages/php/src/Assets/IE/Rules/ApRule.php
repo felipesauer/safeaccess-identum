@@ -31,11 +31,10 @@ final class ApRule extends AbstractStateRule
 
         $base8 = (int)substr($digits, 0, 8);
         $p = 0;
-        $dConst = 0;
+        $dConst = 0; // d is 0 in every range except [3017001..3019022]
 
         if ($base8 >= 3000001 && $base8 <= 3017000) {
             $p = 5;
-            $dConst = 0;
         } elseif ($base8 >= 3017001 && $base8 <= 3019022) {
             $p = 9;
             $dConst = 1;
