@@ -1,0 +1,41 @@
+name: Commitlint
+
+on:
+    pull_request:
+        branches: [main]
+        # `edited` fires when the title changes, which is what gets linted.
+        types: [opened, edited, synchronize, reopened]
+
+permissions:
+    contents: read
+
+jobs:
+    pr-title:
+        name: PR title
+        # Merges are squash-only, so the PR title is the commit that lands on main.
+        # Bot titles are generated and follow their own style (Dependabot capitalises
+        # the subject, release-please uses a `chore(main)` scope), so only human
+        # PRs are checked. Gating on the PR author, not the actor, keeps a human
+        # push to a bot branch from flipping the result.
+        if: >-
+            github.event.pull_request.user.login != 'dependabot[bot]' &&
+            github.event.pull_request.user.login != 'github-actions[bot]'
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+            - name: Setup Node.js
+              uses: ./.github/actions/setup-node-cached
+              with:
+                  node-version: '24'
+
+            - name: Install dependencies
+              run: npm install
+
+            # The title goes through an env var, never straight into the script:
+            # it is attacker-controlled text.
+            - name: Lint PR title
+              env:
+                  PR_TITLE: ${{ github.event.pull_request.title }}
+              run: printf '%s\n' "$PR_TITLE" | npx --no -- commitlint

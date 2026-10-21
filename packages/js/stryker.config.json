@@ -12,8 +12,8 @@
     ],
     "thresholds": {
         "high": 95,
-        "low": 85,
-        "break": 85
+        "low": 88,
+        "break": 88
     },
     "incremental": true,
     "incrementalFile": "reports/mutation/.incremental.json",

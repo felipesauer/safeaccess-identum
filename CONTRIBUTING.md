@@ -106,6 +106,16 @@ ci: add matrix build for PHP 8.4
 deps: bump eslint to v10
 ```
 
+The rule is enforced in two places:
+
+- **Locally**, by the `commit-msg` hook in `.husky/`, which runs commitlint on every
+  commit. `npm install` at the repo root installs it (husky's `prepare` script).
+- **On every pull request**, by the _Commitlint_ workflow, which lints the PR
+  **title**. Merges are squash-only, so the title is the commit that lands on `main`.
+
+Pull requests opened by Dependabot and by release-please are exempt: their titles
+are generated and follow their own style.
+
 ## Pull Request Workflow
 
 1. Fork the repository
