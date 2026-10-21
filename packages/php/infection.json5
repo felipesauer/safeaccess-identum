@@ -7,9 +7,9 @@
         "customPath": "vendor/bin/pest"
     },
     "testFramework": "phpunit",
-    // Keep in sync with scripts/mutation.sh and the PHP CI workflow (both use 85).
-    "minMsi": 85,
-    "minCoveredMsi": 85,
+    // Keep in sync with scripts/mutation.sh and the PHP CI workflow (both use 100).
+    "minMsi": 100,
+    "minCoveredMsi": 100,
     "threads": "max",
     "mutators": {
         "@default": true

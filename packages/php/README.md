@@ -30,7 +30,7 @@ PHP library for validating Brazilian documents — CPF, CNPJ, CNH, CEP, CNS, PIS
 - **IE all 27 states** — every state algorithm implemented and tested with edge cases
 - **Input sanitization by default** — `'529.982.247-25'` and `'52998224725'` both just work
 - **Allow list / deny list** — force-accept or force-reject specific values (allow list wins)
-- **100% line coverage** — tested with Pest 3 · Infection mutation testing (≥ 85% MSI)
+- **100% line coverage** — tested with Pest 3 · Infection mutation testing (100% MSI)
 - **Zero production dependencies** — pure PHP 8.2+
 
 ## The problem

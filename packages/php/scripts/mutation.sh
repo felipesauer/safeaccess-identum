@@ -29,8 +29,8 @@ cp "$COVERAGE_DIR/junit-patched.xml" "$COVERAGE_DIR/junit.xml"
 
 echo "==> Running Infection…"
 exec php vendor/bin/infection \
-    --min-msi=85 \
-    --min-covered-msi=85 \
+    --min-msi=100 \
+    --min-covered-msi=100 \
     --threads=max \
     --only-covering-test-cases \
     --show-mutations \

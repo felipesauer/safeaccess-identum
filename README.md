@@ -66,7 +66,7 @@ The same API in TypeScript, identical output for identical input.
 - **Input sanitization by default** — `'529.982.247-25'` and `'52998224725'` both just work
 - **Allow list / deny list** — force-accept or force-reject specific values (format-agnostic: both input and list entries are sanitized before matching). Allow list takes precedence over deny list
 - **Tree-shakeable (JS)** — per-document subpath exports (`@safeaccess/identum/cpf`) so you only bundle what you import
-- **100% line & function coverage** (branches enforced at 99%+; the remainder are unreachable defensive guards) — Pest + Infection (PHP) · Vitest + Stryker (TypeScript), mutation MSI ≥ 85%
+- **100% line & function coverage** (branches enforced at 99%+; the remainder are unreachable defensive guards) — Pest + Infection (PHP) · Vitest + Stryker (TypeScript), mutation MSI ≥ 100% (PHP) / ≥ 88% (TypeScript)
 - **Zero production dependencies**
 
 ## Packages

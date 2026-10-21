@@ -77,7 +77,7 @@ jobs:
             # Mutation testing also gates pull requests, so a drop in MSI is caught
             # before it reaches main. Only the push-to-main run publishes to the
             # Stryker Dashboard — that report is what the README badge reads.
-            - name: Mutation tests (MSI = 85%)
+            - name: Mutation tests (MSI = 88%)
               if: matrix.node == '24'
               run: npm run test:mutation
               env:
