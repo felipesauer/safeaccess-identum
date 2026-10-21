@@ -30,12 +30,28 @@ updates:
           prefix: 'chore(deps)'
       reviewers:
           - 'felipesauer'
+      # Vitest and its @vitest/* packages are released in lockstep: bumping one
+      # alone breaks the install (e.g. @vitest/coverage-v8 5 against vitest 4), so
+      # they travel in one PR. This group is listed before `npm` on purpose —
+      # Dependabot assigns a dependency to the first group that matches it.
       groups:
+          vitest:
+              patterns:
+                  - 'vitest'
+                  - '@vitest/*'
           npm:
               dependency-type: 'development'
               update-types:
                   - 'minor'
                   - 'patch'
+      # Hold vitest 5: Stryker's vitest runner scores ~8% on it, because every
+      # covered mutant survives (stryker-js #6210). Drop these two entries once
+      # that issue is fixed and the Stryker runner supports Vitest 5.
+      ignore:
+          - dependency-name: 'vitest'
+            update-types: ['version-update:semver-major']
+          - dependency-name: '@vitest/*'
+            update-types: ['version-update:semver-major']
 
     # GitHub Actions
     - package-ecosystem: 'github-actions'
