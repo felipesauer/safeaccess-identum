@@ -32,8 +32,12 @@ updates:
           - 'felipesauer'
       # Vitest and its @vitest/* packages are released in lockstep: bumping one
       # alone breaks the install (e.g. @vitest/coverage-v8 5 against vitest 4), so
-      # they travel in one PR. This group is listed before `npm` on purpose —
-      # Dependabot assigns a dependency to the first group that matches it.
+      # they must travel in one PR. Dependabot resolves overlapping groups by
+      # specificity, not by file order, and `npm` (type + update-types rules)
+      # outranks this pattern-only group. So minor/patch bumps of both land
+      # together in `npm`, and this group only catches what `npm` excludes —
+      # majors — which should bring the pair back together once the ignore below
+      # is lifted.
       groups:
           vitest:
               patterns:
