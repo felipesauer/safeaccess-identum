@@ -85,7 +85,6 @@ final class CNSValidation extends AbstractValidatableDocument
             $rest = $sum % 11;
             $dv   = 11 - $rest;
 
-            $resultado = '';
             if ($dv === 11) {
                 $dv = 0;
                 $resultado = $pis . '000' . $dv;
