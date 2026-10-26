@@ -8,6 +8,7 @@ on:
             - 'package.json'
             - 'package-lock.json'
             - 'eslint.config.js'
+            - 'parity-vectors.json'
             - '.github/workflows/js-ci.yml'
     pull_request:
         branches: [main]
@@ -16,6 +17,7 @@ on:
             - 'package.json'
             - 'package-lock.json'
             - 'eslint.config.js'
+            - 'parity-vectors.json'
             - '.github/workflows/js-ci.yml'
     workflow_dispatch:
 
