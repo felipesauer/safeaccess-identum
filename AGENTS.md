@@ -21,8 +21,8 @@ means nothing but review enforces it.
 1. **Both packages keep the same behavior.** A behavior change in `packages/js/src` or `packages/php/src` is made in the other one in
    the same pull request. The shared ground truth is `parity-vectors.json` at the repository root, read by both
    `packages/js/tests/parity.test.ts` and `packages/php/tests/Unit/ParityTest.php`: a new case goes into that file, not into one
-   language's tests. A pull request that changes only `parity-vectors.json` triggers neither CI workflow (path filters), so run both parity
-   commands yourself. Check: `npm run test:parity` and `composer test:parity`, both in CI (the Node 24 and PHP 8.4 "full" jobs).
+   language's tests. A pull request that changes only `parity-vectors.json` triggers both CI workflows (it is in the path filters of
+   `js-ci.yml` and `php-ci.yml`), and each runs its parity command. Check: `npm run test:parity` and `composer test:parity`, both in CI (the Node 24 and PHP 8.4 "full" jobs).
 2. **Coverage floors are intentional, and they are not the same in the two packages.** PHP: 100% (`--min=100` in `composer test`).
    JS (`packages/js/vitest.config.ts`): lines, functions and statements 100, **branches 99**, with the reason written next to the
    number (unreachable `?? null` guards and RNG-dependent `dv >= 10` arms). Do not raise the 99 by adding contrived tests, and do not
