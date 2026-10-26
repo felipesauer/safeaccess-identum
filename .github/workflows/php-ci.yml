@@ -5,11 +5,13 @@ on:
         branches: [main]
         paths:
             - 'packages/php/**'
+            - 'parity-vectors.json'
             - '.github/workflows/php-ci.yml'
     pull_request:
         branches: [main]
         paths:
             - 'packages/php/**'
+            - 'parity-vectors.json'
             - '.github/workflows/php-ci.yml'
     workflow_dispatch:
 
