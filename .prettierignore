@@ -10,3 +10,6 @@ packages/php/infection.json5
 
 # mnema's record is signed bytes — Prettier rewriting a line would invalidate it.
 .mnema/
+
+# Written by `mnema instructions`, which recognises only its own bytes.
+.github/instructions/mnema-instructions.instructions.md
