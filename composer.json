@@ -1,0 +1,42 @@
+{
+    "name": "safeaccess/identum",
+    "description": "Brazilian document validation library (CPF, CNPJ, CEP, CNH, CNS, PIS, IE, RENAVAM, Voter Title, Mercosul Plate)",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "safeaccess",
+        "identum",
+        "validation",
+        "document",
+        "cpf",
+        "cnpj",
+        "brazilian"
+    ],
+    "homepage": "https://github.com/felipesauer/safeaccess-identum",
+    "authors": [
+        {
+            "name": "Felipe Sauer",
+            "email": "felipesauer11@hotmail.com",
+            "homepage": "https://github.com/felipesauer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/felipesauer/safeaccess-identum/issues",
+        "source": "https://github.com/felipesauer/safeaccess-identum/tree/main/packages/php"
+    },
+    "require": {
+        "php": "^8.2"
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/felipesauer"
+        }
+    ],
+    "minimum-stability": "alpha",
+    "autoload": {
+        "psr-4": {
+            "SafeAccess\\Identum\\": "packages/php/src/"
+        }
+    }
+}
